@@ -1,0 +1,43 @@
+# -------------------------
+# 🚫 RAW DATA (DO NOT PUSH)
+# -------------------------
+Simulator/dataset/raw/
+Simulator/dataset/raw/**
+Simulator/dataset/raw/*
+
+# -------------------------
+# 📦 LARGE FILES
+# -------------------------
+*.zip
+*.csv
+*.pkl
+*.h5
+*.pt
+*.npy
+
+# -------------------------
+# 🧠 ML / MODEL FILES
+# -------------------------
+Simulator/ml/
+Simulator/**/ml/
+Simulator/**/models/
+
+# -------------------------
+# 🧪 CACHE / TEMP
+# -------------------------
+__pycache__/
+*.pyc
+*.log
+
+# -------------------------
+# 🖥️ ENV / SYSTEM FILES
+# -------------------------
+venv/
+.env
+.DS_Store
+
+# -------------------------
+# 📊 OPTIONAL (KEEP ONLY SAMPLE)
+# -------------------------
+# Uncomment if needed:
+# Simulator/dataset/processed/
