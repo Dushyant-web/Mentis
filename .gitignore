@@ -19,7 +19,6 @@ dataset/raw/*
 # 🧠 ML / MODEL FILES
 # -------------------------
 # Keep code, ignore only heavy model files
-*.pkl
 *.h5
 *.pt
 *.npy

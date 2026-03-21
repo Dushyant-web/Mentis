@@ -11,8 +11,10 @@ class User(Base):
     name = Column(String)
     email = Column(String, unique=True)
     password = Column(String)
+    google_id = Column(String, nullable=True)  # add after password
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
 
 
 class Assessment(Base):
