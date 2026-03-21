@@ -2,7 +2,10 @@ import sys
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(BASE_DIR)
+
 sys.path.append(BASE_DIR)
+sys.path.append(ROOT_DIR)
 
 from dotenv import load_dotenv
 load_dotenv()
