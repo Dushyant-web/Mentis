@@ -1,3 +1,9 @@
+import sys
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(BASE_DIR)
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -10,11 +16,6 @@ from db import models
 from routes import assessment, auth, training, dashboard
 from ml.model_loader import get_model, get_scaler
 
-import sys
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(BASE_DIR)
 
 model = get_model()
 scaler = get_scaler()
