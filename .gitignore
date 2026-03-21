@@ -18,10 +18,12 @@ dataset/raw/*
 # -------------------------
 # 🧠 ML / MODEL FILES
 # -------------------------
-ml/
+# Keep code, ignore only heavy model files
+*.pkl
+*.h5
+*.pt
+*.npy
 models/
-**/ml/
-**/models/
 
 # -------------------------
 # 🧪 CACHE / TEMP
