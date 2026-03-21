@@ -56,6 +56,73 @@ def get_exercise_bank():
 
 
 # -----------------------------
+# 🧠 EXTRACT CONFUSION PATTERNS (NEW)
+# -----------------------------
+def extract_confusions(errors):
+    """
+    errors: list of dicts like
+    [{"expected": "b", "got": "d"}]
+    """
+    if not errors:
+        return []
+
+    confusion_map = {}
+
+    for e in errors:
+        a = e.get("expected")
+        b = e.get("got")
+
+        if not a or not b:
+            continue
+
+        key = tuple(sorted([a, b]))  # ('b','d')
+
+        if key not in confusion_map:
+            confusion_map[key] = 0
+
+        confusion_map[key] += 1
+
+    # sort by frequency (highest first)
+    sorted_confusions = sorted(
+        confusion_map.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    # return list like ["b/d", "p/q"]
+    return [f"{a}/{b}" for (a, b), _ in sorted_confusions]
+
+# -----------------------------
+# 🛠️ BUILD CONFUSION EXERCISES (NEW)
+# -----------------------------
+def build_confusion_exercises(confusions, repeat=20):
+    """
+    confusions: ["b/d", "p/q"]
+    returns an exercise dict compatible with bank format
+    """
+    if not confusions:
+        return None
+
+    exercises = []
+    for pair in confusions:
+        parts = pair.split("/")
+        if len(parts) != 2:
+            continue
+        a, b = parts
+        exercises.append({
+            "content": f"{a}{b}",
+            "repeat": repeat
+        })
+
+    return {
+        "name": "Adaptive Confusion Training",
+        "type": "pen",
+        "duration": "15min",
+        "xp": 60,
+        "exercises": exercises
+    }
+
+# -----------------------------
 # 🎯 SELECT EXERCISES BASED ON LEVEL
 # -----------------------------
 def select_exercises(dyslexia_stage, dysgraphia_stage):
@@ -83,19 +150,29 @@ def select_exercises(dyslexia_stage, dysgraphia_stage):
 # -----------------------------
 # 📅 GENERATE TODAY PLAN
 # -----------------------------
-def generate_today_plan(dyslexia_stage, dysgraphia_stage):
+def generate_today_plan(dyslexia_stage, dysgraphia_stage, errors=None):
     exercises = select_exercises(dyslexia_stage, dysgraphia_stage)
 
+    # 🔥 ADAPTIVE: extract confusions from errors and build exercise
+    confusions = extract_confusions(errors or [])
+    adaptive_ex = build_confusion_exercises(confusions)
+
+    # If adaptive exists, prioritize it
+    if adaptive_ex:
+        exercises.insert(0, adaptive_ex)
+
     formatted = []
-    for i, ex in enumerate(exercises):
+    for ex in exercises:
         formatted.append({
-            "id": i + 1,
+            # IMPORTANT: ID must come from DB (TrainingTask.id)
+            # This is a placeholder until DB-driven plan is used
+            "id": None,
             "name": ex["name"],
             "type": ex["type"],
             "duration": ex["duration"],
             "xp": ex["xp"],
             "status": "pending",
-            "data": ex  # full exercise config for frontend
+            "data": ex
         })
 
     return formatted

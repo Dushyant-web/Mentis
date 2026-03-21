@@ -151,7 +151,7 @@ def get_training(token):
     try:
         data = res.json()
         print("Training Plan:", data)
-        print("Today's Exercises:", data.get("program", {}).get("today", {}))
+        print("Today's Exercises:", data.get("today", {}))
         return data
     except Exception:
         print("Training Parse Error:", res.status_code, res.text)
@@ -214,34 +214,41 @@ def complete_task(token, task_id=1):
 # RUN EVERYTHING
 # -------------------------
 if __name__ == "__main__":
+    print("\n🚀 STARTING FULL API TEST FLOW\n")
+
     token = login()
-    # run multiple assessments for trend testing
-    for _ in range(3):
-        session_id = start_assessment(token)
-        if not session_id:
-            continue
-        time.sleep(1)
-        success = submit_assessment(token, session_id)
-        if not success:
-            print("Skipping due to submit failure")
-            continue
+
+    print("\n--- ASSESSMENT FLOW ---")
+    session_id = start_assessment(token)
+    if session_id:
+        submit_assessment(token, session_id)
+    else:
+        print("❌ Assessment start failed")
+
+    print("\n--- HISTORY + ANALYTICS ---")
     get_history(token)
     get_analytics(token)
+
+    print("\n--- TRAINING PLAN ---")
     training_data = get_training(token)
 
-    if training_data and "program" in training_data:
-        exercises = training_data["program"]["today"]["exercises"]
+    if training_data and "today" in training_data:
+        exercises = training_data["today"]["exercises"]
 
-        # complete first 3 unlocked tasks
-        completed = 0
+        print("\n--- COMPLETE ALL UNLOCKED TASKS ---")
         for task in exercises:
             if not task.get("locked", False):
                 complete_task(token, task["id"])
-                completed += 1
-                if completed >= 3:
-                    break
-        get_dashboard_summary(token)
-        get_dashboard_history(token)
-        get_progress_graph(token)
+
+        print("\n--- REFETCH TRAINING (CHECK XP UPDATE) ---")
+        get_training(token)
+
     else:
-        print("No tasks found to complete")
+        print("❌ No training tasks found")
+
+    print("\n--- DASHBOARD ---")
+    get_dashboard_summary(token)
+    get_dashboard_history(token)
+    get_progress_graph(token)
+
+    print("\n✅ ALL API TESTS COMPLETED\n")

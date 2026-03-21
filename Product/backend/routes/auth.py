@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db import models
@@ -7,15 +7,20 @@ from utils.auth import verify_password
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from utils.jwt import create_token
-
+from utils.rate_limiter import rate_limit
+import os
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 router = APIRouter()
 
 @router.post("/signup")
-def signup(data: dict, db: Session = Depends(get_db)):
+def signup(data: dict, request: Request, db: Session = Depends(get_db)):
     email = data.get("email")
     password = data.get("password")
     name = data.get("name")
+
+    client_ip = request.client.host
+    rate_limit(f"signup:{client_ip}", limit=5, window=60)
 
     existing = db.query(models.User).filter(models.User.email == email).first()
     if existing:
@@ -34,9 +39,12 @@ def signup(data: dict, db: Session = Depends(get_db)):
     return {"message": "User created", "user_id": user.id}
 
 @router.post("/login")
-def login(data: dict, db: Session = Depends(get_db)):
+def login(data: dict, request: Request, db: Session = Depends(get_db)):
     email = data.get("email")
     password = data.get("password")
+
+    client_ip = request.client.host
+    rate_limit(f"login:{client_ip}:{email}", limit=5, window=60)
 
     user = db.query(models.User).filter(models.User.email == email).first()
 
@@ -50,8 +58,6 @@ def login(data: dict, db: Session = Depends(get_db)):
         "user_id": user.id
     }
 
-
-GOOGLE_CLIENT_ID = "815960088211-g44k0qsvknni9hrn686qgt39dlp5tggi.apps.googleusercontent.com"
 
 @router.post("/google")
 def google_auth(data: dict, db: Session = Depends(get_db)):

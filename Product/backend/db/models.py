@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, JSON, Text, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base
@@ -47,6 +47,24 @@ class Result(Base):
     dyslexia_stage = Column(String)     # stage_1 / stage_2 / stage_3
     dysgraphia_stage = Column(String)
 
+    # 🔥 per-issue confidence (NEW)
+    dyslexia_confidence = Column(Float, default=0)
+    dysgraphia_confidence = Column(Float, default=0)
+
+    # 🔥 full model probabilities (NEW)
+    prob_normal = Column(Float, default=0)
+    prob_dyslexia = Column(Float, default=0)
+    prob_dysgraphia = Column(Float, default=0)
+    prob_both = Column(Float, default=0)
+
+    # 🔥 uncertainty flag (NEW)
+    uncertainty = Column(Integer, default=0)
+
+    # 🔥 entropy-based uncertainty score (NEW)
+    uncertainty_score = Column(Float, default=0)
+
+    final_score = Column(Float)
+
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Course(Base):
@@ -64,15 +82,8 @@ class Progress(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer)
-
-    # 🔥 NEW: track exact task completion
     task_id = Column(Integer)
-
-    # scores (can still be used for analytics)
-    reading_score = Column(Float)
-    writing_score = Column(Float)
-    rhythm_score = Column(Float)
-
+    xp = Column(Integer)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class TrainingPlan(Base):
@@ -92,7 +103,13 @@ class TrainingTask(Base):
     task_type = Column(String)  # eye / pen / rhythm
     difficulty = Column(String)
     duration = Column(String)
+    xp = Column(Integer, default=50)
     status = Column(String, default="pending")  # pending / done
+
+    # 🧠 Adaptive intelligence fields (NEW)
+    is_adaptive = Column(Boolean, default=False)
+    source = Column(String, nullable=True)   # writing / eye / system
+    content = Column(JSON, nullable=True)    # actual exercise content (confusions, etc.)
 
 
 # New AssessmentSession model
@@ -105,5 +122,93 @@ class AssessmentSession(Base):
 
     eye_data = Column(JSON, nullable=True)
     pen_data = Column(JSON, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class EyeTracking(Base):
+    __tablename__ = "eye_tracking"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+
+    fixation = Column(Float)
+    regressions = Column(Float)
+    reading_speed = Column(Float)
+
+    eye_score = Column(Float)
+    severity = Column(String)
+
+    # 🔥 normalized signals (NEW)
+    regression_rate = Column(Float, default=0)
+    fixation_stability = Column(Float, default=0)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class WritingTest(Base):
+    __tablename__ = "writing_tests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+
+    content = Column(Text)
+    user_input = Column(Text)
+    errors = Column(JSON, nullable=True)
+    confusion_count = Column(Integer, default=0)
+
+    accuracy = Column(Float)
+    speed_wpm = Column(Float)
+    writing_score = Column(Float)
+    stage = Column(String)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -------------------------
+# 🧠 USER LEARNING MEMORY SYSTEM (NEW)
+# -------------------------
+
+class UserWeaknessProfile(Base):
+    __tablename__ = "user_weakness_profile"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+
+    reading_score = Column(Float, default=0)
+    writing_score = Column(Float, default=0)
+    rhythm_score = Column(Float, default=0)
+
+    last_updated = Column(DateTime, default=datetime.utcnow)
+
+
+class IssueHistory(Base):
+    __tablename__ = "issue_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+
+    reading_score = Column(Float)
+    writing_score = Column(Float)
+
+    reading_stage = Column(String)
+    writing_stage = Column(String)
+
+    confidence_reading = Column(Float)
+    confidence_writing = Column(Float)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class FeatureAttribution(Base):
+    __tablename__ = "feature_attributions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    session_id = Column(Integer, ForeignKey("assessment_sessions.id"), index=True)
+
+    feature_name = Column(String, index=True)
+    impact = Column(Float)
+
+    # 🔥 NEW: structured attribution grouping
+    feature_type = Column(String, nullable=True)   # eye / pen / rhythm
+    direction = Column(String, nullable=True)      # positive / negative
 
     created_at = Column(DateTime, default=datetime.utcnow)

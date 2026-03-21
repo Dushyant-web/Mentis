@@ -1,9 +1,9 @@
 # -------------------------
-# 🚫 RAW DATA (DO NOT PUSH)
+# 🚫 RAW DATA
 # -------------------------
-Simulator/dataset/raw/
-Simulator/dataset/raw/**
-Simulator/dataset/raw/*
+dataset/raw/
+dataset/raw/**
+dataset/raw/*
 
 # -------------------------
 # 📦 LARGE FILES
@@ -18,9 +18,10 @@ Simulator/dataset/raw/*
 # -------------------------
 # 🧠 ML / MODEL FILES
 # -------------------------
-Simulator/ml/
-Simulator/**/ml/
-Simulator/**/models/
+ml/
+models/
+**/ml/
+**/models/
 
 # -------------------------
 # 🧪 CACHE / TEMP
@@ -28,6 +29,7 @@ Simulator/**/models/
 __pycache__/
 *.pyc
 *.log
+*.cache
 
 # -------------------------
 # 🖥️ ENV / SYSTEM FILES
@@ -37,7 +39,24 @@ venv/
 .DS_Store
 
 # -------------------------
-# 📊 OPTIONAL (KEEP ONLY SAMPLE)
+# 🗄️ DATABASE FILES
 # -------------------------
-# Uncomment if needed:
-# Simulator/dataset/processed/
+*.sqlite3
+*.db
+
+# -------------------------
+# 🧱 BUILD FILES
+# -------------------------
+dist/
+build/
+
+# -------------------------
+# 🔥 NODE (frontend inside same repo)
+# -------------------------
+node_modules/
+.next/
+
+# -------------------------
+# 📊 OPTIONAL DATA
+# -------------------------
+# dataset/processed/

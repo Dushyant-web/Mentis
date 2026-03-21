@@ -1,0 +1,2202 @@
+[
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "The principle is ___.",
+    "options": [
+      "fundamentel",
+      "foundamental",
+      "fundamental"
+    ],
+    "answer": "fundamental"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: garden",
+    "options": [
+      "nedrag",
+      "gadren",
+      "garned"
+    ],
+    "answer": "nedrag"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'pencil'?",
+    "options": [
+      "pnecil",
+      "pincyl",
+      "pencil"
+    ],
+    "answer": "pencil"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: garden",
+    "options": [
+      "nedrag",
+      "GARDEN",
+      "garden"
+    ],
+    "answer": "garden"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: pin?",
+    "options": [
+      "dib",
+      "pip",
+      "qin"
+    ],
+    "answer": "qin"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'pencil'?",
+    "options": [
+      "pencil",
+      "pnecil",
+      "pincyl"
+    ],
+    "answer": "pencil"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: vocabulary",
+    "options": [
+      "yralubacov",
+      "yarlubacov",
+      "yralubacvo"
+    ],
+    "answer": "yralubacov"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: yellow",
+    "options": [
+      "ylelow",
+      "wolley",
+      "wolley"
+    ],
+    "answer": "wolley"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: pig",
+    "options": [
+      "ipg",
+      "pgi",
+      "gip"
+    ],
+    "answer": "gip"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: window",
+    "options": [
+      "WINDOW",
+      "Window",
+      "window"
+    ],
+    "answer": "Window"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: family",
+    "options": [
+      "ylimaf",
+      "ylimaf",
+      "fmaily"
+    ],
+    "answer": "ylimaf"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: family",
+    "options": [
+      "FAMILY",
+      "Family",
+      "family"
+    ],
+    "answer": "Family"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "The dog wagged ___ tail.",
+    "options": [
+      "it's",
+      "is",
+      "its"
+    ],
+    "answer": "its"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: garden",
+    "options": [
+      "GARDEN",
+      "garden",
+      "Garden"
+    ],
+    "answer": "Garden"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "The ___ of the book.",
+    "options": [
+      "compliment",
+      "complamant",
+      "complement"
+    ],
+    "answer": "complement"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: family",
+    "options": [
+      "family",
+      "ylimaf",
+      "FAMILY"
+    ],
+    "answer": "family"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'comprehension' written?",
+    "options": [
+      "noisneherpmoc",
+      "Orientation confusion pattern",
+      "comqrehension"
+    ],
+    "answer": "comqrehension"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "___ are you going?",
+    "options": [
+      "Where",
+      "Were",
+      "Wear"
+    ],
+    "answer": "Where"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: House",
+    "options": [
+      "hOUSE",
+      "HOUSE",
+      "house"
+    ],
+    "answer": "HOUSE"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: pencil",
+    "options": [
+      "penlic",
+      "licnep",
+      "pecnil"
+    ],
+    "answer": "licnep"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: House",
+    "options": [
+      "house",
+      "hOUSE",
+      "HOUSE"
+    ],
+    "answer": "HOUSE"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: pencil",
+    "options": [
+      "qencil",
+      "pnecil",
+      "licnep"
+    ],
+    "answer": "qencil"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: purple",
+    "options": [
+      "purelp",
+      "elprup",
+      "puprle"
+    ],
+    "answer": "elprup"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "foro",
+      "four",
+      "for"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "breed",
+      "daerb",
+      "bread"
+    ],
+    "answer": "bread"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "sea",
+      "seao",
+      "see"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: window",
+    "options": [
+      "WINDOW",
+      "window",
+      "wodniw"
+    ],
+    "answer": "window"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'yellow'?",
+    "options": [
+      "yellow",
+      "ylelow",
+      "yillow"
+    ],
+    "answer": "yellow"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "The ___ is blue.",
+    "options": [
+      "see",
+      "see",
+      "sea"
+    ],
+    "answer": "sea"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: yellow",
+    "options": [
+      "wolley",
+      "yellow",
+      "YELLOW"
+    ],
+    "answer": "yellow"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: n",
+    "options": [
+      "n",
+      "o",
+      "u"
+    ],
+    "answer": "n"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "school",
+      "loohcs",
+      "schul"
+    ],
+    "answer": "school"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: p",
+    "options": [
+      "q",
+      "p",
+      "o"
+    ],
+    "answer": "p"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "Follow the correct ___.",
+    "options": [
+      "principil",
+      "principal",
+      "principle"
+    ],
+    "answer": "principle"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "intelligence",
+      "intelligense",
+      "entellegence"
+    ],
+    "answer": "intelligence"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "___ going to play.",
+    "options": [
+      "They're",
+      "Their",
+      "There"
+    ],
+    "answer": "They're"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: comprehension",
+    "options": [
+      "noisneherpmoc",
+      "niosneherpmoc",
+      "noisneherpmco"
+    ],
+    "answer": "noisneherpmoc"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "___ a beautiful day.",
+    "options": [
+      "It's",
+      "Is",
+      "Its"
+    ],
+    "answer": "It's"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: n",
+    "options": [
+      "u",
+      "n",
+      "o"
+    ],
+    "answer": "n"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'family'?",
+    "options": [
+      "fumyly",
+      "family",
+      "fmaily"
+    ],
+    "answer": "family"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: yellow",
+    "options": [
+      "YELLOW",
+      "Yellow",
+      "yellow"
+    ],
+    "answer": "Yellow"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "development",
+      "development",
+      "developmant"
+    ],
+    "answer": "development"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: bridge",
+    "options": [
+      "bridge",
+      "BRIDGE",
+      "Bridge"
+    ],
+    "answer": "Bridge"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: winter",
+    "options": [
+      "retniw",
+      "winret",
+      "witner"
+    ],
+    "answer": "retniw"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is emaN resU.",
+      "My name is USER NAME.",
+      "My name is User Name."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: orange",
+    "options": [
+      "orange",
+      "ORANGE",
+      "Orange"
+    ],
+    "answer": "Orange"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "adaptability",
+      "edeptebeleti",
+      "adaptability"
+    ],
+    "answer": "adaptability"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: Apple",
+    "options": [
+      "apple",
+      "APPLE",
+      "aPPLE"
+    ],
+    "answer": "APPLE"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "for",
+      "four",
+      "foro"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: window",
+    "options": [
+      "wodniw",
+      "winwod",
+      "widnow"
+    ],
+    "answer": "wodniw"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "A very ___ dancer.",
+    "options": [
+      "gracefull",
+      "graseful",
+      "graceful"
+    ],
+    "answer": "graceful"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: pencil",
+    "options": [
+      "PENCIL",
+      "pencil",
+      "Pencil"
+    ],
+    "answer": "Pencil"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: bridge",
+    "options": [
+      "birdge",
+      "dridge",
+      "egdirb"
+    ],
+    "answer": "dridge"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: adaptability",
+    "options": [
+      "ytilibatpaad",
+      "ytilibatpada",
+      "yitlibatpada"
+    ],
+    "answer": "ytilibatpada"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "development",
+      "developmant",
+      "development"
+    ],
+    "answer": "development"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "___ at the door?",
+    "options": [
+      "Whose",
+      "Who's",
+      "Whoes"
+    ],
+    "answer": "Who's"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'adaptability' written?",
+    "options": [
+      "Orientation confusion pattern",
+      "adaqtadility",
+      "ytilibatpada"
+    ],
+    "answer": "adaqtadility"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'garden'?",
+    "options": [
+      "garden",
+      "gurdin",
+      "graden"
+    ],
+    "answer": "garden"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: comprehension",
+    "options": [
+      "noisneherpmco",
+      "niosneherpmoc",
+      "noisneherpmoc"
+    ],
+    "answer": "noisneherpmoc"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "rhithm",
+      "rhythm",
+      "rhythm"
+    ],
+    "answer": "rhythm"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: pin?",
+    "options": [
+      "dib",
+      "pip",
+      "qin"
+    ],
+    "answer": "qin"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: personality",
+    "options": [
+      "ytilanosrpe",
+      "ytilanosrep",
+      "yitlanosrep"
+    ],
+    "answer": "ytilanosrep"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'window'?",
+    "options": [
+      "wnidow",
+      "wyndow",
+      "window"
+    ],
+    "answer": "window"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: development",
+    "options": [
+      "tnempolevde",
+      "tnempoleved",
+      "tenmpoleved"
+    ],
+    "answer": "tnempoleved"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "seao",
+      "sea",
+      "see"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: confusion",
+    "options": [
+      "niosufnoc",
+      "noisufnoc",
+      "noisufnco"
+    ],
+    "answer": "noisufnoc"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is emaN resU.",
+      "My name is User Name.",
+      "My name is USER NAME."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "User Name lost ___ way.",
+    "options": [
+      "they're",
+      "there",
+      "their"
+    ],
+    "answer": "their"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'silver'?",
+    "options": [
+      "sliver",
+      "silver",
+      "sylvir"
+    ],
+    "answer": "silver"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: rhythm",
+    "options": [
+      "mhtyrh",
+      "mhtyhr",
+      "mthyhr"
+    ],
+    "answer": "mhtyhr"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'rhythm' written?",
+    "options": [
+      "rhythm (reversed orientation)",
+      "mhtyhr",
+      "Orientation confusion pattern"
+    ],
+    "answer": "rhythm (reversed orientation)"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: garden",
+    "options": [
+      "nedrag",
+      "garned",
+      "gadren"
+    ],
+    "answer": "nedrag"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "User Name is ___.",
+    "options": [
+      "here",
+      "her",
+      "hear"
+    ],
+    "answer": "here"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: red",
+    "options": [
+      "rde",
+      "der",
+      "erd"
+    ],
+    "answer": "der"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "Do you ___ the bell?",
+    "options": [
+      "hear",
+      "here",
+      "her"
+    ],
+    "answer": "hear"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: window",
+    "options": [
+      "window",
+      "Window",
+      "WINDOW"
+    ],
+    "answer": "Window"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: boy",
+    "options": [
+      "byo",
+      "oby",
+      "yob"
+    ],
+    "answer": "yob"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is emaN resU.",
+      "My name is User Name.",
+      "My name is USER NAME."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: pot?",
+    "options": [
+      "dob",
+      "pop",
+      "qot"
+    ],
+    "answer": "qot"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: purple",
+    "options": [
+      "purple",
+      "PURPLE",
+      "Purple"
+    ],
+    "answer": "Purple"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "loohcs",
+      "schul",
+      "school"
+    ],
+    "answer": "school"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: Apple",
+    "options": [
+      "aPPLE",
+      "APPLE",
+      "apple"
+    ],
+    "answer": "APPLE"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: p",
+    "options": [
+      "o",
+      "p",
+      "q"
+    ],
+    "answer": "p"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: yellow",
+    "options": [
+      "wolley",
+      "yellow",
+      "yelwol"
+    ],
+    "answer": "wolley"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: Table",
+    "options": [
+      "tABLE",
+      "TABLE",
+      "table"
+    ],
+    "answer": "TABLE"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: b",
+    "options": [
+      "b",
+      "o",
+      "d"
+    ],
+    "answer": "b"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: Star",
+    "options": [
+      "sTAR",
+      "STAR",
+      "star"
+    ],
+    "answer": "STAR"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: purple",
+    "options": [
+      "purple",
+      "PURPLE",
+      "elprup"
+    ],
+    "answer": "purple"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: bridge",
+    "options": [
+      "brdige",
+      "egdirb",
+      "briegd"
+    ],
+    "answer": "egdirb"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: winter",
+    "options": [
+      "winter",
+      "retniw",
+      "WINTER"
+    ],
+    "answer": "winter"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "I feel an ___ of joy.",
+    "options": [
+      "accent",
+      "ascent",
+      "assent"
+    ],
+    "answer": "ascent"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is emaN resU.",
+      "My name is User Name.",
+      "My name is USER NAME."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'purple'?",
+    "options": [
+      "pruple",
+      "purple",
+      "purpli"
+    ],
+    "answer": "purple"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: bad?",
+    "options": [
+      "bap",
+      "dad",
+      "dab"
+    ],
+    "answer": "dad"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "___ book is this?",
+    "options": [
+      "Who's",
+      "Whoes",
+      "Whose"
+    ],
+    "answer": "Whose"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: cat",
+    "options": [
+      "tac",
+      "act",
+      "cta"
+    ],
+    "answer": "tac"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is User Name.",
+      "My name is USER NAME.",
+      "My name is emaN resU."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "sea",
+      "seao",
+      "see"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: hat",
+    "options": [
+      "tah",
+      "aht",
+      "hta"
+    ],
+    "answer": "tah"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'development' written?",
+    "options": [
+      "Orientation confusion pattern",
+      "tnempoleved",
+      "develoqment"
+    ],
+    "answer": "develoqment"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: environment",
+    "options": [
+      "tnemnorivne",
+      "tenmnorivne",
+      "tnemnoriven"
+    ],
+    "answer": "tnemnorivne"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is USER NAME.",
+      "My name is User Name.",
+      "My name is emaN resU."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'adaptations' written?",
+    "options": [
+      "snoitatpada",
+      "adaqtations",
+      "Orientation confusion pattern"
+    ],
+    "answer": "adaqtations"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: garden",
+    "options": [
+      "Garden",
+      "garden",
+      "GARDEN"
+    ],
+    "answer": "Garden"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: bog?",
+    "options": [
+      "bop",
+      "dob",
+      "dog"
+    ],
+    "answer": "dog"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: p",
+    "options": [
+      "q",
+      "p",
+      "o"
+    ],
+    "answer": "p"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: silver",
+    "options": [
+      "silver",
+      "revlis",
+      "SILVER"
+    ],
+    "answer": "silver"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: window",
+    "options": [
+      "wodniw",
+      "wnidow",
+      "wodniw"
+    ],
+    "answer": "wodniw"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "four",
+      "for",
+      "foro"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: bad?",
+    "options": [
+      "bap",
+      "dad",
+      "dab"
+    ],
+    "answer": "dad"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'orange'?",
+    "options": [
+      "orungi",
+      "orange",
+      "oarnge"
+    ],
+    "answer": "orange"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: pot?",
+    "options": [
+      "qot",
+      "pop",
+      "dob"
+    ],
+    "answer": "qot"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "confusion",
+      "confusion",
+      "confuseon"
+    ],
+    "answer": "confusion"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: winter",
+    "options": [
+      "winter",
+      "WINTER",
+      "Winter"
+    ],
+    "answer": "Winter"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'family'?",
+    "options": [
+      "fmaily",
+      "family",
+      "fumyly"
+    ],
+    "answer": "family"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: family",
+    "options": [
+      "Family",
+      "FAMILY",
+      "family"
+    ],
+    "answer": "Family"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: b",
+    "options": [
+      "o",
+      "d",
+      "b"
+    ],
+    "answer": "b"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "four",
+      "for",
+      "foro"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: intelligence",
+    "options": [
+      "ecnegilletni",
+      "encegilletni",
+      "ecnegilletin"
+    ],
+    "answer": "ecnegilletni"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "The ___ of the island.",
+    "options": [
+      "seenery",
+      "scenery",
+      "senery"
+    ],
+    "answer": "scenery"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "elppa",
+      "apple",
+      "applee"
+    ],
+    "answer": "apple"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'vocabulary' written?",
+    "options": [
+      "Orientation confusion pattern",
+      "vocadulary",
+      "yralubacov"
+    ],
+    "answer": "vocadulary"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "comprehension",
+      "comprehenseon",
+      "comprehension"
+    ],
+    "answer": "comprehension"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "User Name is the school ___.",
+    "options": [
+      "principal",
+      "principle",
+      "principil"
+    ],
+    "answer": "principal"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "intelligense",
+      "intelligence",
+      "entellegence"
+    ],
+    "answer": "intelligence"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: boy",
+    "options": [
+      "byo",
+      "yob",
+      "oby"
+    ],
+    "answer": "yob"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is User Name.",
+      "My name is emaN resU.",
+      "My name is USER NAME."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "confuseon",
+      "confusion",
+      "confusion"
+    ],
+    "answer": "confusion"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: silver",
+    "options": [
+      "silver",
+      "SILVER",
+      "Silver"
+    ],
+    "answer": "Silver"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: p",
+    "options": [
+      "o",
+      "q",
+      "p"
+    ],
+    "answer": "p"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'winter'?",
+    "options": [
+      "winter",
+      "wyntir",
+      "wniter"
+    ],
+    "answer": "winter"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: w",
+    "options": [
+      "w",
+      "o",
+      "m"
+    ],
+    "answer": "w"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "This is ___ you.",
+    "options": [
+      "fore",
+      "four",
+      "for"
+    ],
+    "answer": "for"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: window",
+    "options": [
+      "wodniw",
+      "winwod",
+      "widnow"
+    ],
+    "answer": "wodniw"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "adaptability",
+      "adaptability",
+      "edeptebeleti"
+    ],
+    "answer": "adaptability"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "___ is my gift.",
+    "options": [
+      "Thes",
+      "This",
+      "Tish"
+    ],
+    "answer": "This"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "edepteteons",
+      "adaptations",
+      "adaptashuns"
+    ],
+    "answer": "adaptations"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: big",
+    "options": [
+      "bgi",
+      "ibg",
+      "gib"
+    ],
+    "answer": "gib"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "Give her a nice ___.",
+    "options": [
+      "complement",
+      "compliment",
+      "complamant"
+    ],
+    "answer": "compliment"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "vocebuleri",
+      "vocabulary",
+      "vocabulary"
+    ],
+    "answer": "vocabulary"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: orange",
+    "options": [
+      "oarnge",
+      "egnaro",
+      "egnaro"
+    ],
+    "answer": "egnaro"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I ate ___ apples.",
+    "options": [
+      "four",
+      "for",
+      "fore"
+    ],
+    "answer": "four"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "school",
+      "schul",
+      "loohcs"
+    ],
+    "answer": "school"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: pen",
+    "options": [
+      "pne",
+      "nep",
+      "epn"
+    ],
+    "answer": "nep"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "neerg",
+      "green",
+      "gren"
+    ],
+    "answer": "green"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: development",
+    "options": [
+      "tnempoleved",
+      "tenmpoleved",
+      "tnempolevde"
+    ],
+    "answer": "tnempoleved"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: orange",
+    "options": [
+      "orange",
+      "egnaro",
+      "ORANGE"
+    ],
+    "answer": "orange"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: User Name",
+    "options": [
+      "user name",
+      "uSER NAME",
+      "USER NAME"
+    ],
+    "answer": "USER NAME"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "neerg",
+      "gren",
+      "green"
+    ],
+    "answer": "green"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is emaN resU.",
+      "My name is USER NAME.",
+      "My name is User Name."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "___ a good friend.",
+    "options": [
+      "Yore",
+      "Your",
+      "You're"
+    ],
+    "answer": "You're"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'bridge'?",
+    "options": [
+      "brydgi",
+      "birdge",
+      "bridge"
+    ],
+    "answer": "bridge"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "sea",
+      "seao",
+      "see"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "comprehension",
+      "comprehenseon",
+      "comprehension"
+    ],
+    "answer": "comprehension"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: bridge",
+    "options": [
+      "BRIDGE",
+      "egdirb",
+      "bridge"
+    ],
+    "answer": "bridge"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'window'?",
+    "options": [
+      "window",
+      "wyndow",
+      "wnidow"
+    ],
+    "answer": "window"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: adaptability",
+    "options": [
+      "ytilibatpada",
+      "ytilibatpaad",
+      "yitlibatpada"
+    ],
+    "answer": "ytilibatpada"
+  },
+  {
+    "type": "case",
+    "difficulty": "easy",
+    "question": "Rewrite in ALL CAPS: Apple",
+    "options": [
+      "apple",
+      "aPPLE",
+      "APPLE"
+    ],
+    "answer": "APPLE"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "Did he give his ___?",
+    "options": [
+      "accent",
+      "ascent",
+      "assent"
+    ],
+    "answer": "assent"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: pencil",
+    "options": [
+      "licnep",
+      "penlic",
+      "pecnil"
+    ],
+    "answer": "licnep"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "I like to ___ my red hat.",
+    "options": [
+      "wear",
+      "were",
+      "where"
+    ],
+    "answer": "wear"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'intelligence' written?",
+    "options": [
+      "intelligence (reversed orientation)",
+      "ecnegilletni",
+      "Orientation confusion pattern"
+    ],
+    "answer": "intelligence (reversed orientation)"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: winter",
+    "options": [
+      "retniw",
+      "retniw",
+      "wniter"
+    ],
+    "answer": "retniw"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: confusion",
+    "options": [
+      "noisufnoc",
+      "niosufnoc",
+      "noisufnco"
+    ],
+    "answer": "noisufnoc"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to go ___ the park.",
+    "options": [
+      "beo",
+      "be",
+      "bee"
+    ],
+    "answer": "to"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "applee",
+      "elppa",
+      "apple"
+    ],
+    "answer": "apple"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'confusion' written?",
+    "options": [
+      "Orientation confusion pattern",
+      "noisufnoc",
+      "confusion (reversed orientation)"
+    ],
+    "answer": "confusion (reversed orientation)"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I have ___ eyes.",
+    "options": [
+      "too",
+      "two",
+      "to"
+    ],
+    "answer": "two"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is User Name.",
+      "My name is emaN resU.",
+      "My name is USER NAME."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'orange'?",
+    "options": [
+      "orungi",
+      "oarnge",
+      "orange"
+    ],
+    "answer": "orange"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: garden",
+    "options": [
+      "graden",
+      "nedrag",
+      "nedrag"
+    ],
+    "answer": "nedrag"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "hard",
+    "question": "The building has many ___.",
+    "options": [
+      "starys",
+      "storeys",
+      "stories"
+    ],
+    "answer": "storeys"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: pot?",
+    "options": [
+      "dob",
+      "qot",
+      "pop"
+    ],
+    "answer": "qot"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "I want to ___ happy.",
+    "options": [
+      "bea",
+      "bee",
+      "be"
+    ],
+    "answer": "be"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: intelligence",
+    "options": [
+      "ecnegilletni",
+      "ecnegilletin",
+      "encegilletni"
+    ],
+    "answer": "ecnegilletni"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "easy",
+    "question": "A buzz from the ___.",
+    "options": [
+      "be",
+      "bea",
+      "bee"
+    ],
+    "answer": "bee"
+  },
+  {
+    "type": "matching",
+    "difficulty": "hard",
+    "question": "Which sentence uses the correct placeholder?",
+    "options": [
+      "My name is emaN resU.",
+      "My name is USER NAME.",
+      "My name is User Name."
+    ],
+    "answer": "My name is User Name."
+  },
+  {
+    "type": "mirror",
+    "difficulty": "easy",
+    "question": "Which is the mirror of: pot?",
+    "options": [
+      "qot",
+      "pop",
+      "dob"
+    ],
+    "answer": "qot"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "hard",
+    "question": "Select the correct spelling of the complex word.",
+    "options": [
+      "enveronment",
+      "environment",
+      "environmant"
+    ],
+    "answer": "environment"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: purple",
+    "options": [
+      "elprup",
+      "pruple",
+      "qurqle"
+    ],
+    "answer": "qurqle"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "I ___ a new bike.",
+    "options": [
+      "boat",
+      "brought",
+      "bought"
+    ],
+    "answer": "bought"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "medium",
+    "question": "Which is the correct spelling for 'garden'?",
+    "options": [
+      "garden",
+      "graden",
+      "gurdin"
+    ],
+    "answer": "garden"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "Put it over ___.",
+    "options": [
+      "their",
+      "there",
+      "they're"
+    ],
+    "answer": "there"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: cat",
+    "options": [
+      "tac",
+      "cta",
+      "act"
+    ],
+    "answer": "tac"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "Is that ___ pen?",
+    "options": [
+      "you're",
+      "yore",
+      "your"
+    ],
+    "answer": "your"
+  },
+  {
+    "type": "mirror",
+    "difficulty": "medium",
+    "question": "Mirror the visual pattern of: silver",
+    "options": [
+      "revlis",
+      "sliver",
+      "revlis"
+    ],
+    "answer": "revlis"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "hard",
+    "question": "Reverse this complex word: adaptations",
+    "options": [
+      "sonitatpada",
+      "snoitatpada",
+      "snoitatpaad"
+    ],
+    "answer": "snoitatpada"
+  },
+  {
+    "type": "phonetic",
+    "difficulty": "medium",
+    "question": "The ___ is sunny.",
+    "options": [
+      "weather",
+      "whether",
+      "wether"
+    ],
+    "answer": "weather"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'environment' written?",
+    "options": [
+      "tnemnorivne",
+      "environment (reversed orientation)",
+      "Orientation confusion pattern"
+    ],
+    "answer": "environment (reversed orientation)"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: silver",
+    "options": [
+      "sivler",
+      "silrev",
+      "revlis"
+    ],
+    "answer": "revlis"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "school",
+      "loohcs",
+      "schul"
+    ],
+    "answer": "school"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: orange",
+    "options": [
+      "oraegn",
+      "ornage",
+      "egnaro"
+    ],
+    "answer": "egnaro"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "hard",
+    "question": "If all 'b' becomes 'd' and 'p' becomes 'q', how is 'personality' written?",
+    "options": [
+      "Orientation confusion pattern",
+      "ytilanosrep",
+      "qersonality"
+    ],
+    "answer": "qersonality"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: orange",
+    "options": [
+      "oraegn",
+      "egnaro",
+      "ornage"
+    ],
+    "answer": "egnaro"
+  },
+  {
+    "type": "case",
+    "difficulty": "medium",
+    "question": "Select the properly capitalized name: orange",
+    "options": [
+      "ORANGE",
+      "orange",
+      "Orange"
+    ],
+    "answer": "Orange"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "easy",
+    "question": "Reverse the word: boy",
+    "options": [
+      "byo",
+      "yob",
+      "oby"
+    ],
+    "answer": "yob"
+  },
+  {
+    "type": "matching",
+    "difficulty": "medium",
+    "question": "Find the exact match for: pencil",
+    "options": [
+      "licnep",
+      "PENCIL",
+      "pencil"
+    ],
+    "answer": "pencil"
+  },
+  {
+    "type": "orientation",
+    "difficulty": "easy",
+    "question": "Identify the letter: p",
+    "options": [
+      "q",
+      "p",
+      "o"
+    ],
+    "answer": "p"
+  },
+  {
+    "type": "spelling",
+    "difficulty": "easy",
+    "question": "Which spelling is correct?",
+    "options": [
+      "retaw",
+      "water",
+      "watere"
+    ],
+    "answer": "water"
+  },
+  {
+    "type": "reverse",
+    "difficulty": "medium",
+    "question": "Identify the reverse of: family",
+    "options": [
+      "ylimaf",
+      "faimly",
+      "famyli"
+    ],
+    "answer": "ylimaf"
+  }
+]
