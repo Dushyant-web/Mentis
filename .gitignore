@@ -10,7 +10,6 @@ dataset/raw/*
 # -------------------------
 *.zip
 *.csv
-*.pkl
 *.h5
 *.pt
 *.npy
@@ -22,7 +21,7 @@ dataset/raw/*
 *.h5
 *.pt
 *.npy
-models/
+
 
 # -------------------------
 # 🧪 CACHE / TEMP
@@ -60,4 +59,4 @@ node_modules/
 # -------------------------
 # 📊 OPTIONAL DATA
 # -------------------------
-# dataset/processed/
+dataset/processed/
