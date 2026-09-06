@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(cp /Users/dushyant/Mentis/V_1/Product/frontend/logo-asset/mentis-mark.svg /Users/dushyant/Mentis/V_1/Product/frontend/public/mentis-mark.svg)",
-      "Bash(cp /Users/dushyant/Mentis/V_1/Product/frontend/logo-asset/mentis-logo-horizontal.svg /Users/dushyant/Mentis/V_1/Product/frontend/public/mentis-logo.svg)",
-      "Bash(curl -s -o /tmp/final.html -w \"landing HTTP %{http_code}\\\\n\" http://localhost:3000)"
-    ]
-  }
-}
