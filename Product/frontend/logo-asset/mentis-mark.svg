@@ -1,0 +1,6 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mentis logo mark">
+  <title>Mentis</title>
+  <rect x="2" y="2" width="116" height="116" rx="32" fill="#2B2230"/>
+  <circle cx="60" cy="23" r="6.5" fill="#E0735A"/>
+  <path d="M26 90 L40 38 L60 64 L80 38 L94 90 Q97 88 100 81" fill="none" stroke="#FCEEE8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

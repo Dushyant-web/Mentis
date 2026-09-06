@@ -211,44 +211,48 @@ def complete_task(token, task_id=1):
 
 
 # -------------------------
+# 12. PROGRESS SIMULATION
+# -------------------------
+def run_simulation(token, count=5):
+    print(f"\n🚀 SIMULATING {count} PROGRESS SESSIONS...")
+    for i in range(count):
+        print(f"--- Session {i+1}/{count} ---")
+        sid = start_assessment(token)
+        if sid:
+            submit_assessment(token, sid)
+        
+        # Complete a few random tasks to boost XP
+        for _ in range(2):
+            complete_task(token, random.randint(1, 20))
+        
+        time.sleep(0.5)
+    print("✅ SIMULATION COMPLETE\n")
+
+
+# -------------------------
 # RUN EVERYTHING
 # -------------------------
 if __name__ == "__main__":
-    print("\n🚀 STARTING FULL API TEST FLOW\n")
+    print("\n🚀 STARTING MENTIS API TEST FLOW\n")
 
     token = login()
 
-    print("\n--- ASSESSMENT FLOW ---")
-    session_id = start_assessment(token)
-    if session_id:
-        submit_assessment(token, session_id)
+    # Ask user if they want to run simulation
+    choice = input("Run progress simulation? (y/n): ").lower()
+    if choice == 'y':
+        count = input("How many sessions? (default 5): ")
+        run_simulation(token, int(count) if count else 5)
     else:
-        print("❌ Assessment start failed")
+        print("\n--- SINGLE ASSESSMENT FLOW ---")
+        session_id = start_assessment(token)
+        if session_id:
+            submit_assessment(token, session_id)
+        else:
+            print("❌ Assessment start failed")
 
-    print("\n--- HISTORY + ANALYTICS ---")
-    get_history(token)
-    get_analytics(token)
-
-    print("\n--- TRAINING PLAN ---")
-    training_data = get_training(token)
-
-    if training_data and "today" in training_data:
-        exercises = training_data["today"]["exercises"]
-
-        print("\n--- COMPLETE ALL UNLOCKED TASKS ---")
-        for task in exercises:
-            if not task.get("locked", False):
-                complete_task(token, task["id"])
-
-        print("\n--- REFETCH TRAINING (CHECK XP UPDATE) ---")
-        get_training(token)
-
-    else:
-        print("❌ No training tasks found")
-
-    print("\n--- DASHBOARD ---")
+    print("\n--- REFRESHING DASHBOARD DATA ---")
     get_dashboard_summary(token)
-    get_dashboard_history(token)
     get_progress_graph(token)
+    get_training(token)
 
     print("\n✅ ALL API TESTS COMPLETED\n")

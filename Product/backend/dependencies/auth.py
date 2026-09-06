@@ -14,7 +14,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-        return user_id
+        return int(user_id) # 🔥 Consistently return INT
 
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid or expired token")

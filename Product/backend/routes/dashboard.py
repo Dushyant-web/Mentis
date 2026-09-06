@@ -1,13 +1,17 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from sqlalchemy import func, case
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db import models
 from dependencies.auth import get_current_user
-from datetime import date
+from datetime import date, datetime, timedelta
 from utils.rate_limiter import rate_limit
 import numpy as np
+from utils.profile_manager import get_or_create_weakness_profile
+from utils.cache import cache_get, cache_set
+from schemas import EyeDataRequest, WritingTestRequest
 
-
+ 
 try:
     import shap
     SHAP_AVAILABLE = True
@@ -153,7 +157,12 @@ def calculate_trend(results):
 
 @router.get("/summary")
 def get_dashboard(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
-    rate_limit(f"dashboard_summary:{user_id}", limit=10, window=60)
+    rate_limit(f"dashboard_summary:{user_id}", limit=60, window=60)
+
+    # 🚀 Serve from cache if fresh (recomputed on every new assessment)
+    _cached = cache_get(f"summary:{user_id}")
+    if _cached is not None:
+        return _cached
 
     # latest result
     latest = db.query(models.Result)\
@@ -201,10 +210,10 @@ def get_dashboard(db: Session = Depends(get_db), user_id=Depends(get_current_use
     alpha = 0.4
 
     smoothed = {
-        "dyslexia": 0,
-        "dysgraphia": 0,
-        "both": 0,
-        "normal": 0
+        "dyslexia": 0.0,
+        "dysgraphia": 0.0,
+        "both": 0.0,
+        "normal": 0.0
     }
 
     for r in reversed(results):
@@ -264,43 +273,94 @@ def get_dashboard(db: Session = Depends(get_db), user_id=Depends(get_current_use
 
     # 🔥 use smoothed probabilities instead of single snapshot
     filtered = {k: v for k, v in smoothed.items() if k != "normal"}
-    main_issue = max(filtered, key=filtered.get)
+    main_issue = max(filtered, key=lambda k: filtered[k]) if filtered else "None"
 
 
+
+    # 🔥 FETCH ADVANCED METRICS
+    advanced_eye = db.query(models.AdvancedEyeMetrics)\
+        .filter(models.AdvancedEyeMetrics.user_id == user_id)\
+        .order_by(models.AdvancedEyeMetrics.created_at.desc())\
+        .first()
+    
+    # 🔥 FETCH WEAKNESS PROFILE
+    profile = db.query(models.UserWeaknessProfile).filter(models.UserWeaknessProfile.user_id == user_id).first()
+    weakness_profile = {
+        "reading": getattr(profile, 'reading_score', 0) if profile else 0,
+        "writing": getattr(profile, 'writing_score', 0) if profile else 0,
+        "rhythm": getattr(profile, 'rhythm_score', 0) if profile else 0
+    }
 
     insights = generate_insights(latest, db)
     recommendations = generate_recommendations(latest)
     trend = calculate_trend(results)
 
-    return {
+    # 🚀 Batched aggregates — collapse 6 round-trips into 2 via conditional aggregation.
+    today = date.today()
+    week_ago = datetime.utcnow() - timedelta(days=7)
+
+    prog_counts = db.query(
+        func.count(case((func.date(models.Progress.created_at) == today, models.Progress.id))),
+        func.count(case((models.Progress.created_at >= week_ago, models.Progress.id))),
+    ).filter(models.Progress.user_id == user_id).first()
+    daily_exercises = prog_counts[0] or 0
+    weekly_exercises = prog_counts[1] or 0
+
+    task_agg = db.query(
+        func.count(case((func.date(models.TrainingTask.created_at) == today, models.TrainingTask.id))),
+        func.count(case((models.TrainingTask.created_at >= week_ago, models.TrainingTask.id))),
+        func.sum(case((models.TrainingTask.status == "done", models.TrainingTask.xp), else_=0)),
+        func.sum(models.TrainingTask.xp),
+    ).join(models.TrainingPlan).filter(models.TrainingPlan.user_id == user_id).first()
+    daily_goal = task_agg[0] or 4
+    weekly_goal = task_agg[1] or 28
+    xp_earned = task_agg[2] or 0
+    xp_total = task_agg[3] or 0
+
+    _resp = {
         "summary": {
-            "prediction": latest.level,
+            "prediction": getattr(latest, 'level', 'Initial'),
             "risk_level": risk_level,
             "main_issue": main_issue,
-            "confidence": latest.confidence,
+            "confidence": getattr(latest, 'confidence', 0),
             "final_score": final_score,
             "confidence_spread": confidence_spread,
             "uncertainty_score": uncertainty_score,
+            "daily_exercises": daily_exercises,  # 🔥 ONLY today's progress
+            "weekly_exercises": weekly_exercises,
+            "daily_goal": daily_goal,
+            "weekly_goal": weekly_goal,
+            "xp_earned": xp_earned,
+            "xp_total": xp_total,
             "probabilities": {
                 "current": {
-                    "normal": latest.prob_normal or 0.0,
-                    "dyslexia": latest.prob_dyslexia or 0.0,
-                    "dysgraphia": latest.prob_dysgraphia or 0.0,
-                    "both": latest.prob_both or 0.0
+                    "normal": getattr(latest, 'prob_normal', 0.0),
+                    "dyslexia": getattr(latest, 'prob_dyslexia', 0.0),
+                    "dysgraphia": getattr(latest, 'prob_dysgraphia', 0.0),
+                    "both": getattr(latest, 'prob_both', 0.0)
                 },
                 "smoothed": smoothed
             },
         },
 
         "severity": {
-            "dyslexia": latest.dyslexia_stage,
-            "dysgraphia": latest.dysgraphia_stage
+            "dyslexia": getattr(latest, 'dyslexia_stage', 1),
+            "dysgraphia": getattr(latest, 'dysgraphia_stage', 1)
         },
 
         "scores": {
-            "dyslexia_score": latest.dyslexia_score,
-            "dysgraphia_score": latest.dysgraphia_score
+            "dyslexia_score": getattr(latest, 'dyslexia_score', 0),
+            "dysgraphia_score": getattr(latest, 'dysgraphia_score', 0)
         },
+
+        "advanced_metrics": {
+            "avg_jerk": (latest.dysgraphia_score or 0) * 10, # Normalize for frontend 100-(avg_jerk*10)
+            "regressions": getattr(advanced_eye, 'regression_count', 0) if advanced_eye else 0,
+            "fixation_stability": getattr(advanced_eye, 'fixation_variance', 0) if advanced_eye else 0,
+            "rhythm_score": weakness_profile["rhythm"] # Pass rhythm directly
+        },
+
+        "weakness_profile": weakness_profile,
 
         "insights": insights,
 
@@ -309,6 +369,9 @@ def get_dashboard(db: Session = Depends(get_db), user_id=Depends(get_current_use
         "recommendations": recommendations
     }
 
+    cache_set(f"summary:{user_id}", _resp, ttl=30)
+    return _resp
+
 
 # -------------------------
 # 📜 DIAGNOSIS HISTORY
@@ -316,7 +379,7 @@ def get_dashboard(db: Session = Depends(get_db), user_id=Depends(get_current_use
 
 @router.get("/history")
 def diagnosis_history(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
-    rate_limit(f"dashboard_history:{user_id}", limit=10, window=60)
+    rate_limit(f"dashboard_history:{user_id}", limit=60, window=60)
 
     results = db.query(models.Result)\
         .join(models.Assessment)\
@@ -343,8 +406,9 @@ def diagnosis_history(db: Session = Depends(get_db), user_id=Depends(get_current
 
 @router.get("/progress-graph")
 def get_progress(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
-    rate_limit(f"dashboard_progress:{user_id}", limit=10, window=60)
+    rate_limit(f"dashboard_progress:{user_id}", limit=60, window=60)
 
+    # 🔥 Fetch latest results (scores)
     results = db.query(models.Result)\
         .join(models.Assessment)\
         .filter(models.Assessment.user_id == user_id)\
@@ -354,9 +418,26 @@ def get_progress(db: Session = Depends(get_db), user_id=Depends(get_current_user
     if not results:
         return {"message": "No data"}
 
+    # 🔥 Fetch raw eye tracking data (WPM)
+    eye_records = db.query(models.EyeTracking)\
+        .filter(models.EyeTracking.user_id == user_id)\
+        .order_by(models.EyeTracking.created_at.asc())\
+        .all()
+
+    # 🔥 Fetch raw writing data (Accuracy/WPM)
+    writing_records = db.query(models.WritingTest)\
+        .filter(models.WritingTest.user_id == user_id)\
+        .order_by(models.WritingTest.created_at.asc())\
+        .all()
+
     reading_trend = []
     writing_trend = []
     confidence_trend = []
+    
+    # Raw values for "Value" display (WPM, etc)
+    reading_speed_trend = []
+    writing_accuracy_trend = []
+    
     dates = []
 
     for r in results:
@@ -365,10 +446,22 @@ def get_progress(db: Session = Depends(get_db), user_id=Depends(get_current_user
         confidence_trend.append(r.confidence)
         dates.append(r.created_at.date().isoformat())
 
+    # Map raw metrics if available (matching by index is a proxy, but we use the same sorting)
+    for i in range(len(results)):
+        # eye data
+        speed = eye_records[i].reading_speed if i < len(eye_records) else 0
+        reading_speed_trend.append(speed)
+        
+        # writing data 
+        acc = writing_records[i].accuracy if i < len(writing_records) else 0
+        writing_accuracy_trend.append(acc)
+
     return {
         "reading_trend": reading_trend,
         "writing_trend": writing_trend,
         "confidence_trend": confidence_trend,
+        "reading_speed_trend": reading_speed_trend,
+        "writing_accuracy_trend": writing_accuracy_trend,
         "dates": dates
     }
 
@@ -378,7 +471,7 @@ def get_progress(db: Session = Depends(get_db), user_id=Depends(get_current_user
 
 @router.get("/improvement")
 def get_improvement(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
-    rate_limit(f"dashboard_improvement:{user_id}", limit=10, window=60)
+    rate_limit(f"dashboard_improvement:{user_id}", limit=60, window=60)
 
     results = db.query(models.Result)\
         .join(models.Assessment)\
@@ -411,7 +504,7 @@ def get_improvement(db: Session = Depends(get_db), user_id=Depends(get_current_u
 
 @router.get("/training-progress")
 def get_training_progress(db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
-    rate_limit(f"dashboard_training:{user_id}", limit=10, window=60)
+    rate_limit(f"dashboard_training:{user_id}", limit=60, window=60)
 
     # get all progress entries (ordered)
     records = db.query(models.Progress)\
@@ -422,11 +515,12 @@ def get_training_progress(db: Session = Depends(get_db), user_id: int = Depends(
     # 🔥 fetch task difficulties
     task_ids = [r.task_id for r in records if r.task_id is not None]
 
+    # Map id → task object once, so the per-record loop is O(1) lookups
+    # instead of re-scanning the task list for every progress record.
     task_map = {}
     if task_ids:
         tasks = db.query(models.TrainingTask).filter(models.TrainingTask.id.in_(task_ids)).all()
-        for t in tasks:
-            task_map[t.id] = t.difficulty
+        task_map = {t.id: t for t in tasks}
 
     reading_trend = []
     writing_trend = []
@@ -443,19 +537,18 @@ def get_training_progress(db: Session = Depends(get_db), user_id: int = Depends(
         day = r.created_at.date().isoformat()
         daily_counts[day] += 1
 
-        difficulty = task_map.get(r.task_id, "medium")
+        task = task_map.get(r.task_id)
+        difficulty = task.difficulty if task else "medium"
 
         # categorize tasks (future scalable)
         category = "reading"
-        if r.task_id in task_map:
-            task = next((t for t in tasks if t.id == r.task_id), None)
-            if task:
-                if task.task_type == "eye":
-                    category = "reading"
-                elif task.task_type == "pen":
-                    category = "writing"
-                else:
-                    category = "rhythm"
+        if task:
+            if task.task_type == "eye":
+                category = "reading"
+            elif task.task_type == "pen":
+                category = "writing"
+            else:
+                category = "rhythm"
 
         # 🎯 difficulty weights
         if difficulty == "easy":
@@ -513,16 +606,8 @@ def get_training_progress(db: Session = Depends(get_db), user_id: int = Depends(
         writing_trend.append(round((writing_total / norm_factor) * 100, 2))
         rhythm_trend.append(round((rhythm_total / norm_factor) * 100, 2))
 
-        # better normalization (max possible weighted score)
-        max_possible_per_task = 60  # closer to real XP
-        max_total = norm_factor * max_possible_per_task
-
-        if max_total > 0:
-            overall_score = (overall_total / max_total) * 100
-        else:
-            overall_score = 0
-
-        overall_trend.append(round(min(overall_score, 100), 2))
+        # Cumulative XP trend
+        overall_trend.append(round(overall_total, 2))
 
         dates.append(day)
 
@@ -544,6 +629,7 @@ def get_training_progress(db: Session = Depends(get_db), user_id: int = Depends(
         "rhythm_trend": rhythm_trend, 
         "overall_trend": overall_trend,
         "dates": dates,
+        "exercise_dates": [r.created_at.date().isoformat() for r in records], # 🔥 RAW DATES FOR ACCURATE COUNTING
         "streak": streak
     }
 
@@ -554,7 +640,11 @@ def get_training_progress(db: Session = Depends(get_db), user_id: int = Depends(
 
 @router.get("/diagnosis")
 def get_diagnosis(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
-    rate_limit(f"dashboard_diagnosis:{user_id}", limit=10, window=60)
+    rate_limit(f"dashboard_diagnosis:{user_id}", limit=60, window=60)
+
+    _cached = cache_get(f"diagnosis:{user_id}")
+    if _cached is not None:
+        return _cached
 
     latest = db.query(models.Result)\
         .join(models.Assessment)\
@@ -637,7 +727,7 @@ def get_diagnosis(db: Session = Depends(get_db), user_id=Depends(get_current_use
     else:
         action = "confident"
 
-    return {
+    _resp = {
         "prediction": top_label,
         "confidence": round(top_prob, 2),
         "uncertainty": uncertainty,
@@ -668,12 +758,15 @@ def get_diagnosis(db: Session = Depends(get_db), user_id=Depends(get_current_use
         }
     }
 
+    cache_set(f"diagnosis:{user_id}", _resp, ttl=30)
+    return _resp
+
 # -------------------------
 # 👁️ EYE TRACKING API
 # -------------------------
 
 @router.post("/eye-data")
-def save_eye_data(data: dict, db: Session = Depends(get_db), user_id=Depends(get_current_user)):
+def save_eye_data(data: EyeDataRequest, db: Session = Depends(get_db), user_id=Depends(get_current_user)):
     rate_limit(f"eye_data:{user_id}", limit=20, window=60)
 
     """
@@ -688,10 +781,10 @@ def save_eye_data(data: dict, db: Session = Depends(get_db), user_id=Depends(get
     }
     """
 
-    fixation = data.get("fixation_time", 0)
-    saccades = data.get("saccades", 0)
-    regressions = data.get("regressions", 0)
-    reading_speed = data.get("reading_speed", 0)
+    fixation = data.fixation_time
+    saccades = data.saccades
+    regressions = data.regressions
+    reading_speed = data.reading_speed
 
     # -------------------------
     # 🧠 FEATURE SCORING
@@ -748,20 +841,7 @@ def save_eye_data(data: dict, db: Session = Depends(get_db), user_id=Depends(get
     # -------------------------
     # 🧠 UPDATE LEARNING MEMORY (READING)
     # -------------------------
-    profile = db.query(models.UserWeaknessProfile).filter(
-        models.UserWeaknessProfile.user_id == user_id
-    ).first()
-
-    if not profile:
-        profile = models.UserWeaknessProfile(
-            user_id=user_id,
-            reading_score=0,
-            writing_score=0,
-            rhythm_score=0
-        )
-        db.add(profile)
-        db.commit()
-        db.refresh(profile)
+    profile = get_or_create_weakness_profile(db, user_id)
 
     lr = 0.1
     performance = min(max(eye_score / 6.0, 0), 1)
@@ -784,7 +864,7 @@ def save_eye_data(data: dict, db: Session = Depends(get_db), user_id=Depends(get
 # -------------------------
 
 @router.post("/writing-test")
-def writing_test(data: dict, db: Session = Depends(get_db), user_id=Depends(get_current_user)):
+def writing_test(data: WritingTestRequest, db: Session = Depends(get_db), user_id=Depends(get_current_user)):
     rate_limit(f"writing_test:{user_id}", limit=20, window=60)
 
     """
@@ -801,9 +881,9 @@ def writing_test(data: dict, db: Session = Depends(get_db), user_id=Depends(get_
 
     import difflib
 
-    content = data.get("content", "").lower().strip()
-    user_input = data.get("user_input", "").lower().strip()
-    time_taken = data.get("time_taken", 1)
+    content = data.content.lower().strip()
+    user_input = data.user_input.lower().strip()
+    time_taken = data.time_taken
 
     # -------------------------
     # 🔤 CHARACTER ACCURACY
@@ -907,20 +987,7 @@ def writing_test(data: dict, db: Session = Depends(get_db), user_id=Depends(get_
     # -------------------------
     # 🧠 UPDATE LEARNING MEMORY (WRITING)
     # -------------------------
-    profile = db.query(models.UserWeaknessProfile).filter(
-        models.UserWeaknessProfile.user_id == user_id
-    ).first()
-
-    if not profile:
-        profile = models.UserWeaknessProfile(
-            user_id=user_id,
-            reading_score=0,
-            writing_score=0,
-            rhythm_score=0
-        )
-        db.add(profile)
-        db.commit()
-        db.refresh(profile)
+    profile = get_or_create_weakness_profile(db, user_id)
 
     lr = 0.1
     performance = min(max(writing_score / 5.0, 0), 1)
@@ -935,5 +1002,37 @@ def writing_test(data: dict, db: Session = Depends(get_db), user_id=Depends(get_
         "writing_score": round(writing_score, 2),
         "stage": stage,
         "feedback": feedback,
-        "errors": errors[:10]  # limit
+        "errors": (errors or [])[:10]  # limit
     }
+
+# -------------------------
+# 📄 PDF DYSLEXIA-FRIENDLY READER
+# Scans a PDF (embedded text → fast; scanned pages → EasyOCR), saves the
+# extracted text to a temp file, and returns it so the frontend can re-render
+# it in a dyslexia-friendly format (Arial bold + generous spacing).
+# -------------------------
+@router.post("/scan-pdf")
+async def scan_pdf(file: UploadFile = File(...), user_id=Depends(get_current_user)):
+    rate_limit(f"scan_pdf:{user_id}", limit=60, window=60)
+
+    filename = (file.filename or "").lower()
+    if not filename.endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Please upload a PDF file")
+
+    data = await file.read()
+    if len(data) > 15 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="PDF too large (max 15MB)")
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty file")
+
+    try:
+        from utils.pdf_reader import extract_pdf_text
+        result = extract_pdf_text(data)
+    except Exception as e:
+        print(f"🔥 PDF scan error: {e}")
+        raise HTTPException(status_code=500, detail="Could not read this PDF")
+
+    if not result.get("text"):
+        raise HTTPException(status_code=422, detail="No readable text found in this PDF")
+
+    return result

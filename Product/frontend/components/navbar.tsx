@@ -33,26 +33,21 @@ export function Navbar() {
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
           isScrolled
             ? "bg-background/90 backdrop-blur-lg shadow-sm py-3"
-            : "bg-transparent py-5"
+            : "bg-gradient-to-b from-black/25 to-transparent py-5"
         )}
       >
         <div className="container mx-auto px-6 lg:px-12">
           <nav className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="group flex items-center gap-3">
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-primary rounded-xl transform rotate-6 transition-transform group-hover:rotate-12" />
-                <span className="relative font-bold text-primary-foreground text-xl">M</span>
-              </div>
-              <span
+            <Link href="/" className="group flex items-center">
+              <img
+                src="/mentis-logo.svg"
+                alt="MENTIS"
                 className={cn(
-                  "font-bold text-2xl tracking-tight transition-colors",
-                  isScrolled ? "text-foreground" : "text-foreground"
+                  "h-9 transition-all group-hover:scale-105",
+                  !isScrolled && "brightness-0 invert" // white wordmark over the dark hero
                 )}
-                style={{ fontFamily: "var(--font-fredoka)" }}
-              >
-                MENTIS
-              </span>
+              />
             </Link>
 
             {/* Desktop Navigation */}
@@ -64,7 +59,7 @@ export function Navbar() {
                   className={cn(
                     "relative text-sm font-medium transition-colors hover:text-primary",
                     "after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full",
-                    isScrolled ? "text-foreground/80" : "text-foreground/80"
+                    isScrolled ? "text-foreground/80" : "text-white/85"
                   )}
                 >
                   {link.label}
@@ -72,20 +67,37 @@ export function Navbar() {
               ))}
             </div>
 
-            {/* CTA Button */}
-            <div className="hidden lg:flex items-center gap-4">
-              <Button
-                size="lg"
-                className="rounded-full px-8 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
-              >
-                Get Started
-              </Button>
+            {/* Auth Buttons */}
+            <div className="hidden lg:flex items-center gap-3">
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "rounded-full px-6 font-medium hover:text-primary",
+                    isScrolled ? "text-foreground/80" : "text-white/90 hover:bg-white/10"
+                  )}
+                >
+                  Log In
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button
+                  size="sm"
+                  className="rounded-full px-6 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+                >
+                  Sign Up Free
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
+              className={cn(
+                "lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors",
+                isScrolled ? "text-foreground" : "text-white"
+              )}
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
@@ -140,14 +152,24 @@ export function Navbar() {
               ))}
             </nav>
 
-            <div className="mt-8 pt-8 border-t border-border">
-              <Button
-                size="lg"
-                className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Get Started
-              </Button>
+            <div className="mt-8 pt-8 border-t border-border space-y-3">
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full rounded-full"
+                >
+                  Log In
+                </Button>
+              </Link>
+              <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button
+                  size="lg"
+                  className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  Sign Up Free
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

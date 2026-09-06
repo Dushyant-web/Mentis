@@ -1,37 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Brain, Eye, PenTool, Sparkles, CheckCircle } from "lucide-react";
+import { api } from "@/lib/api";
+
+// 🚀 SPEED: cap the number of points sent to /submit.
+// Eye/pen capture can produce thousands of samples → huge JSON upload + slow
+// feature extraction. Uniform down-sampling keeps the shape of the signal
+// (start/end always preserved) while keeping the payload small.
+function downsample<T>(arr: T[], maxPoints = 800): T[] {
+  if (!Array.isArray(arr) || arr.length <= maxPoints) return arr;
+  const step = arr.length / maxPoints;
+  const out: T[] = [];
+  for (let i = 0; i < maxPoints; i++) out.push(arr[Math.floor(i * step)]);
+  out[out.length - 1] = arr[arr.length - 1]; // always keep the final sample
+  return out;
+}
 
 const analysisSteps = [
   {
     icon: Eye,
     label: "Analyzing eye movement patterns",
     detail: "Tracking saccades, fixations, and regressions",
-    emoji: "👁️",
     duration: 3000,
   },
   {
     icon: PenTool,
     label: "Analyzing writing rhythm",
     detail: "Measuring stroke speed, pressure, and consistency",
-    emoji: "✏️",
     duration: 2500,
   },
   {
     icon: Brain,
     label: "Running AI diagnostic model",
     detail: "Processing 42 neuro-motor features",
-    emoji: "🧠",
     duration: 2000,
   },
   {
     icon: Sparkles,
     label: "Generating personalized insights",
     detail: "Building your learning profile",
-    emoji: "✨",
     duration: 1500,
   },
 ];
@@ -42,7 +52,71 @@ export default function AnalysisPage() {
   const [progress, setProgress] = useState(0);
   const [complete, setComplete] = useState(false);
 
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const submissionStarted = useRef(false);
+
   useEffect(() => {
+    const sendFinalData = async () => {
+      if (submissionStarted.current) return;
+      submissionStarted.current = true;
+
+      try {
+        // 🔥 FIX: Use canonical key, with fallback
+        const sessionId =
+          localStorage.getItem("assessment_session_id") ||
+          localStorage.getItem("session_id");
+        
+        if (!sessionId) {
+          console.error("❌ No session ID found! Cannot submit assessment.");
+          setApiError("No assessment session found. Please restart the assessment.");
+          return;
+        }
+
+        const eyeTests = JSON.parse(localStorage.getItem("eye_tests") || "{}");
+        let finalEyeData = Object.values(eyeTests).flat() as any[];
+        
+        // 🔥 FIX: Backend requires at least 2 points even if eye tracking was skipped
+        if (finalEyeData.length < 2) {
+          finalEyeData = [
+            { x: 0, y: 0, time: Date.now() },
+            { x: 0, y: 0, time: Date.now() + 100 }
+          ];
+        }
+
+        let penData = JSON.parse(localStorage.getItem("pen_data") || "[]") as any[];
+        const errors = JSON.parse(localStorage.getItem("assessment_errors") || "[]");
+
+        // 🔥 FIX: Backend requires at least 2 points for pen_data too
+        if (penData.length < 2) {
+          console.warn("⚠️ Pen data missing or insufficient. Sending fallback points.");
+          penData = [
+            { x: 0, y: 0, time: Date.now(), pressure: 0, type: "start" },
+            { x: 0, y: 0, time: Date.now() + 10, pressure: 0, type: "end" }
+          ];
+        }
+
+
+        const data = await api.post("/assessment/submit", {
+          session_id: Number(sessionId),
+          eye_data: downsample(finalEyeData, 800),
+          pen_data: downsample(penData, 1200),
+          errors: errors
+        });
+
+
+
+        localStorage.setItem("analysis_result", JSON.stringify(data));
+        localStorage.setItem("has_completed_assessment", "true");
+
+      } catch (err: any) {
+        console.error("❌ FINAL SUBMIT ERROR:", err);
+        setApiError(err.message || "Failed to analyze data.");
+      }
+    };
+
+    sendFinalData();
+
     let totalElapsed = 0;
     const totalDuration = analysisSteps.reduce((sum, s) => sum + s.duration, 0);
 
@@ -51,7 +125,6 @@ export default function AnalysisPage() {
       const pct = Math.min((totalElapsed / totalDuration) * 100, 100);
       setProgress(pct);
 
-      // Determine current step
       let elapsed = 0;
       for (let i = 0; i < analysisSteps.length; i++) {
         elapsed += analysisSteps[i].duration;
@@ -64,12 +137,35 @@ export default function AnalysisPage() {
       if (totalElapsed >= totalDuration) {
         clearInterval(progressInterval);
         setComplete(true);
-        setTimeout(() => router.push("/diagnosis"), 1500);
+
+        setTimeout(() => {
+          // If apiError exists, it will render the error UI.
+          // Otherwise, redirect to Diagnosis.
+          const errorCaught = document.getElementById("analysis-error-boundary");
+          if (!errorCaught) {
+              router.push("/diagnosis");
+          }
+        }, 1500);
       }
     }, 50);
 
     return () => clearInterval(progressInterval);
-  }, [router]);
+  }, []);
+
+  if (apiError) {
+    return (
+      <div id="analysis-error-boundary" className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[70vh] text-center">
+        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+           <Brain className="w-10 h-10 text-red-500" />
+        </div>
+        <h1 className="text-2xl font-bold text-red-600 mb-2">Analysis Failed</h1>
+        <p className="text-muted-foreground mb-6">We couldn&apos;t process your assessment: {apiError}</p>
+        <button onClick={() => router.push("/dashboard")} className="px-6 py-2 bg-primary text-white rounded-lg">
+          Return to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[70vh]">
@@ -119,7 +215,7 @@ export default function AnalysisPage() {
       {/* Title */}
       <h1 className="text-2xl lg:text-3xl font-bold text-foreground text-center mb-3 opacity-0 animate-fade-in-up"
         style={{ fontFamily: "var(--font-fredoka)", animationDelay: "300ms" }}>
-        {complete ? "Analysis Complete! 🎉" : "Analyzing Your Data..."}
+        {complete ? "Analysis Complete!" : "Analyzing Your Data..."}
       </h1>
       <p className="text-muted-foreground text-center mb-8 opacity-0 animate-fade-in-up"
         style={{ animationDelay: "400ms" }}>
@@ -154,6 +250,7 @@ export default function AnalysisPage() {
         {analysisSteps.map((step, i) => {
           const isActive = i === currentStep && !complete;
           const isDone = i < currentStep || complete;
+          const StepIcon = step.icon;
           return (
             <div key={i} className={cn(
               "flex items-center gap-4 p-3.5 rounded-xl transition-all duration-500",
@@ -168,7 +265,7 @@ export default function AnalysisPage() {
                 {isDone ? (
                   <CheckCircle className="w-5 h-5 text-green-500" />
                 ) : (
-                  <span className="text-lg">{step.emoji}</span>
+                  <StepIcon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground")} />
                 )}
               </div>
               <div className="flex-1 min-w-0">

@@ -1,0 +1,9 @@
+<svg viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mentis">
+  <title>Mentis</title>
+  <g transform="translate(87,8)">
+    <circle cx="60" cy="23" r="6.5" fill="#E0735A"/>
+    <path d="M26 90 L40 38 L60 64 L80 38 L94 90 Q97 88 100 81" fill="none" stroke="#2B2230" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="150" y="170" text-anchor="middle" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="46" font-weight="500" letter-spacing="8" fill="#2B2230">MENTIS</text>
+  <text x="150" y="195" text-anchor="middle" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="12" font-weight="500" letter-spacing="5" fill="#9A8F86">FOR EVERY YOUNG MIND</text>
+</svg>

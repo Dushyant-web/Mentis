@@ -8,8 +8,8 @@ if not SECRET_KEY:
 
 ALGORITHM = "HS256"
 
-# 🔐 Configurable expiry (default: 2 hours)
-ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("JWT_EXPIRE_HOURS", 2))
+# 🔐 Configurable expiry (default: 24 hours — prevents mid-assessment token death)
+ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("JWT_EXPIRE_HOURS", 24))
 
 
 def create_token(data: dict):
@@ -25,14 +25,19 @@ def create_token(data: dict):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_token(token: str):
+def decode_token(token: str, ignore_expired: bool = False):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if ignore_expired:
+            # We use options to skip 'exp' validation ONLY for the refresh flow
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM], options={"verify_exp": False})
+        else:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-        # extra safety: check exp manually (optional but robust)
-        exp = payload.get("exp")
-        if exp and datetime.utcnow().timestamp() > exp:
-            raise Exception("Token expired")
+        # extra safety: check exp manually if not ignoring
+        if not ignore_expired:
+            exp = payload.get("exp")
+            if exp and datetime.utcnow().timestamp() > exp:
+                raise Exception("Token expired")
 
         return payload
 

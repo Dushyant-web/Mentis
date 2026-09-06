@@ -1,0 +1,8 @@
+<svg viewBox="0 0 520 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mentis">
+  <title>Mentis</title>
+  <g transform="translate(6,5)">
+    <circle cx="60" cy="23" r="6.5" fill="#E0735A"/>
+    <path d="M26 90 L40 38 L60 64 L80 38 L94 90 Q97 88 100 81" fill="none" stroke="#FCEEE8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="142" y="82" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="58" font-weight="500" letter-spacing="9" fill="#FCEEE8">MENTIS</text>
+</svg>

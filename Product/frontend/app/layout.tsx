@@ -57,11 +57,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${nunito.variable} ${fredoka.variable}`}>
-      <body className="font-sans antialiased overflow-x-hidden">
-        {children}
-        <Analytics />
-      </body>
+     <html lang="en" className={`${nunito.variable} ${fredoka.variable}`}>
+       <body className="font-sans antialiased overflow-x-clip">
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+         {children}
+         <Analytics />
+       </body>
     </html>
   )
 }

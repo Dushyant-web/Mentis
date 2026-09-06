@@ -1,20 +1,32 @@
 def extract_confusions(errors):
     """
-    Convert raw errors into confusion pairs
-    Example:
-    [{"expected": "b", "got": "d"}] → ["b/d"]
+    Convert raw errors into confusion pairs.
+    Supports BOTH formats:
+    - Old: [{"expected": "b", "got": "d"}]
+    - New: [{"target": "qp", "actual": "dp", "step": 1, "confidence": 0.5}]
     """
     confusions = []
 
     for err in errors:
-        expected = err.get("expected")
-        got = err.get("got")
+        # Support both formats
+        expected = err.get("expected") or err.get("target", "")
+        got = err.get("got") or err.get("actual", "")
 
-        if expected and got and expected != got:
+        if not expected or not got or expected == got:
+            continue
+
+        # If multi-character (target/actual format), compare char by char
+        if len(expected) > 1 or len(got) > 1:
+            for i in range(min(len(expected), len(got))):
+                if expected[i] != got[i]:
+                    pair = f"{expected[i]}/{got[i]}"
+                    reverse_pair = f"{got[i]}/{expected[i]}"
+                    if pair not in confusions and reverse_pair not in confusions:
+                        confusions.append(pair)
+        else:
+            # Single character comparison
             pair = f"{expected}/{got}"
             reverse_pair = f"{got}/{expected}"
-
-            # avoid duplicates like b/d and d/b
             if pair not in confusions and reverse_pair not in confusions:
                 confusions.append(pair)
 
@@ -74,6 +86,22 @@ def build_multi_type_exercises(confusions):
             "type": "memory",
             "task": f"Write from memory: {letters}",
             "repeat": 10
+        })
+
+        # 🖊️ Tracing Drill (NEW)
+        exercises.append({
+            "type": "tracing",
+            "task": f"Trace the letter: {letters[0]}",
+            "letter": letters[0],
+            "repeat": 15
+        })
+
+        # 🔁 Reversal Awareness (NEW)
+        exercises.append({
+            "type": "reversal_check",
+            "task": f"Which one is correct? {letters[0]} or {letters[1]}?",
+            "correct": letters[0],
+            "wrong": letters[1]
         })
 
     return {

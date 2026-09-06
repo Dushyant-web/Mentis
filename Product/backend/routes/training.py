@@ -4,14 +4,15 @@ from sqlalchemy import func, String
 from db.database import get_db
 from db import models
 from dependencies.auth import get_current_user
-from datetime import datetime
-from utils.training_generator_V2 import generate_program
+from datetime import datetime, timedelta
+from utils.training_generator_V2 import generate_today_plan, compute_user_level
 from ml.exercise_engine import complete_exercise_db
 import numpy as np
 from utils.rate_limiter import rate_limit
 from ml.model_loader import get_model, get_scaler
+from utils.profile_manager import get_or_create_weakness_profile
 
-# Load model and scaler globally
+# Load model and scaler globally 
 model = get_model()
 scaler = get_scaler()
 
@@ -24,8 +25,6 @@ except ImportError:
 # -------------------------
 # 🔥 Load ML + SHAP (GLOBAL)
 # -------------------------
-
-
 
 try:
     import shap
@@ -146,7 +145,7 @@ def get_plan(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
     if not result:
         return {"message": "No assessment found"}
 
-    # 🔥 FETCH TASKS FROM DB (REAL IDs)
+    # 🔥 FETCH LATEST PLAN
     plan = db.query(models.TrainingPlan)\
         .filter(models.TrainingPlan.user_id == user_id)\
         .order_by(models.TrainingPlan.created_at.desc())\
@@ -155,9 +154,96 @@ def get_plan(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
     if not plan:
         return {"message": "No training plan found"}
 
-    tasks = db.query(models.TrainingTask)\
+    # 🔥 FETCH LATEST EXERCISE BATCH
+    today = datetime.utcnow().date()
+    
+    latest_task_date = db.query(func.max(func.date(models.TrainingTask.created_at)))\
         .filter(models.TrainingTask.plan_id == plan.id)\
-        .all()
+        .scalar()
+        
+    tasks = []
+    generate_new = False
+    is_completed_waiting = False
+    
+    if not latest_task_date:
+        generate_new = True
+    else:
+        tasks = db.query(models.TrainingTask)\
+            .filter(
+                models.TrainingTask.plan_id == plan.id,
+                func.date(models.TrainingTask.created_at) == latest_task_date
+            )\
+            .all()
+            
+        all_done = all(t.status == "done" for t in tasks) if tasks else False
+        
+        if all_done:
+            if today > latest_task_date:
+                generate_new = True
+                tasks = [] # Will be regenerated below
+            else:
+                is_completed_waiting = True
+
+    # -------------------------
+    # 🧠 COMPUTE USER LEVEL (NEW)
+    # -------------------------
+    user_level = compute_user_level(db, user_id)
+
+    # -------------------------
+    # 🗓️ DAILY REGENERATION (If requested by cycle logic)
+    # -------------------------
+    if generate_new:
+        # 🔥 THROTTLE: Check if any tasks were JUST created for this plan in the last 15 seconds
+        # This prevents race conditions if the user refreshes quickly.
+        recent_check = db.query(models.TrainingTask)\
+            .filter(
+                models.TrainingTask.plan_id == plan.id,
+                models.TrainingTask.created_at >= datetime.utcnow() - timedelta(seconds=15)
+            ).first()
+        
+        if recent_check:
+            # Tasks already exists or being created by parallel request
+            # Return existing tasks instead of regenerating
+            tasks = db.query(models.TrainingTask)\
+                .filter(
+                    models.TrainingTask.plan_id == plan.id,
+                    func.date(models.TrainingTask.created_at) == today
+                ).all()
+            generate_new = False
+        else:
+            # Latest writing errors (for adaptive confusion training)
+            latest_writing = db.query(models.WritingTest)\
+                .filter(models.WritingTest.user_id == user_id)\
+                .order_by(models.WritingTest.created_at.desc())\
+                .first()
+            
+            errors = latest_writing.errors if latest_writing else []
+            
+            # 🔥 FIX: Pass db and user_id for error-driven adaptive training
+            new_plans = generate_today_plan(user_level, errors, db=db, user_id=user_id)
+            
+            for tp in new_plans:
+                new_task = models.TrainingTask(
+                    plan_id=plan.id,
+                    task_name=tp["name"],
+                    task_type=tp["type"],
+                    difficulty=tp.get("difficulty", "medium"),
+                    duration=tp["duration"],
+                    xp=tp["xp"],
+                    status="pending",
+                    created_at=datetime.utcnow()
+                )
+                db.add(new_task)
+            
+            db.commit()
+        
+        # Refetch
+        tasks = db.query(models.TrainingTask)\
+            .filter(
+                models.TrainingTask.plan_id == plan.id,
+                func.date(models.TrainingTask.created_at) == today
+            )\
+            .all()
 
     # -------------------------
     # 🔥 SHAP → FEATURE ANALYSIS (NEW)
@@ -184,7 +270,18 @@ def get_plan(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
             top_class = result.level if result.level in class_names else class_names[0]
             class_index = class_names.index(top_class)
 
-            values = shap_values[class_index][0]
+            # 🔥 FIX: handle SHAP output safely (list vs array)
+            if isinstance(shap_values, list):
+                if class_index < len(shap_values):
+                    values = shap_values[class_index]
+                else:
+                    values = shap_values[0]
+            else:
+                values = shap_values
+
+            # ensure correct shape (1, n_features)
+            if len(values.shape) == 2:
+                values = values[0]
 
             feature_names = FEATURE_NAMES
 
@@ -205,18 +302,18 @@ def get_plan(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
         "rhythm": 0
     }
 
-    # 🔥 Use persistent memory instead of only latest result
-    profile = db.query(models.UserWeaknessProfile).filter(
-        models.UserWeaknessProfile.user_id == user_id
-    ).first()
+    # 🔥 Use persistent memory instead of only latest result (Atomic Get/Create)
+    profile = get_or_create_weakness_profile(db, user_id)
 
-    if profile:
-        weakness_profile["reading"] = profile.reading_score or 0
-        weakness_profile["writing"] = profile.writing_score or 0
-        weakness_profile["rhythm"] = profile.rhythm_score or 0
+    weakness_profile["reading"] = profile.reading_score or 0
+    weakness_profile["writing"] = profile.writing_score or 0
+    weakness_profile["rhythm"] = profile.rhythm_score or 0
 
-    # fallback if no profile
-    if not profile:
+    # check if profile is empty (0/0/0)
+    is_empty = (not profile.reading_score and not profile.writing_score and not profile.rhythm_score)
+    
+    if is_empty:
+        # fallback if no profile data yet
         latest_result = db.query(models.Result)\
             .join(models.Assessment)\
             .filter(models.Assessment.user_id == user_id)\
@@ -456,32 +553,20 @@ def get_plan(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
             })
 
     # 📊 Progress calculation FIRST
-    today = datetime.utcnow().date()
-
-    completed_tasks = db.query(models.Progress)\
-        .filter(
-            models.Progress.user_id == user_id,
-            models.Progress.created_at >= today
-        )\
-        .count()
-
     # 🔒 Lock system based on real progress
+    completed_tasks_count = sum(1 for ex in exercises if ex.get("status") == "done")
+
     for i, ex in enumerate(exercises):
         if ex.get("adaptive"):
             ex["locked"] = False
         else:
             ex["locked"] = True
 
-    unlock_limit = min(completed_tasks + 1, len(exercises))
+    unlock_limit = min(completed_tasks_count + 1, len(exercises))
     for i in range(unlock_limit):
         exercises[i]["locked"] = False
 
-    earned_xp = db.query(func.sum(models.Progress.xp))\
-        .filter(
-            models.Progress.user_id == user_id,
-            models.Progress.created_at >= today
-        )\
-        .scalar() or 0
+    earned_xp = sum(ex["xp"] for ex in exercises if ex.get("status") == "done")
 
     # -------------------------
     # 🧠 SMART PROGRESS (WEIGHTED)
@@ -525,14 +610,26 @@ def get_plan(db: Session = Depends(get_db), user_id=Depends(get_current_user)):
     # 🎯 XP calculation
     total_xp = sum(e["xp"] for e in exercises)
 
+    # -------------------------
+    # 🗓️ PROGRAM WEEK CALCULATION
+    # -------------------------
+    days_since_start = (datetime.utcnow() - plan.created_at).days
+    total_weeks = 8
+    # clamp to the program length so we never report "Week 14 of 8"
+    current_week = min((days_since_start // 7) + 1, total_weeks)
+
     return {
         "today": {
             "progress": adjusted_progress,
             "xp_earned": earned_xp,
             "weakness_profile": weakness_profile,
-            "exercises": exercises
+            "exercises": exercises,
+            "current_week": current_week,
+            "total_weeks": total_weeks,
+            "all_completed_waiting": is_completed_waiting
         },
-        "xp_today_total": total_xp
+        "xp_today_total": total_xp,
+        "adaptive_level": user_level
     }
 
 
@@ -651,6 +748,66 @@ def complete_training_task(task_id: int, db: Session = Depends(get_db), user_id=
 
     db.commit()
 
+    # -------------------------
+    # 🔥 ADAPTIVE DIFFICULTY PROGRESSION
+    # -------------------------
+    # Calculate total XP earned by user
+    total_xp_rows = db.query(models.TrainingTask)\
+        .join(models.TrainingPlan)\
+        .filter(
+            models.TrainingPlan.user_id == user_id,
+            models.TrainingTask.status == "done"
+        ).with_entities(models.TrainingTask.xp).all()
+    
+    total_xp = sum(x[0] for x in total_xp_rows if x[0]) if total_xp_rows else 0
+    
+    # Count completed exercises
+    done_count = db.query(models.TrainingTask)\
+        .join(models.TrainingPlan)\
+        .filter(
+            models.TrainingPlan.user_id == user_id,
+            models.TrainingTask.status == "done"
+        ).count()
+    
+    # Determine user's current difficulty level
+    # Level 1 (Beginner): 0-199 XP or 0-4 exercises → easy
+    # Level 2 (Intermediate): 200-499 XP or 5-14 exercises → medium
+    # Level 3 (Advanced): 500+ XP or 15+ exercises → hard
+    difficulty_upgraded = False
+    user_level = "beginner"
+    
+    if total_xp >= 500 or done_count >= 15:
+        target_difficulty = "hard"
+        user_level = "advanced"
+    elif total_xp >= 200 or done_count >= 5:
+        target_difficulty = "medium"
+        user_level = "intermediate"
+    else:
+        target_difficulty = "easy"
+        user_level = "beginner"
+    
+    # Upgrade pending tasks if user has leveled up
+    difficulty_order = {"easy": 0, "medium": 1, "hard": 2, "adaptive": 1}
+    pending_tasks = db.query(models.TrainingTask)\
+        .filter(
+            models.TrainingTask.plan_id == task.plan_id,
+            models.TrainingTask.status == "pending"
+        ).all()
+    
+    for pt in pending_tasks:
+        current_diff = (pt.difficulty or "medium").lower()
+        if difficulty_order.get(current_diff, 0) < difficulty_order.get(target_difficulty, 0):
+            pt.difficulty = target_difficulty
+            # Also bump XP for harder exercises
+            if target_difficulty == "hard":
+                pt.xp = max(pt.xp or 0, 70)
+            elif target_difficulty == "medium":
+                pt.xp = max(pt.xp or 0, 50)
+            difficulty_upgraded = True
+    
+    if difficulty_upgraded:
+        db.commit()
+
     # determine next unlocked task
     next_task = db.query(models.TrainingTask)\
         .filter(models.TrainingTask.plan_id == task.plan_id, models.TrainingTask.status == "pending")\
@@ -660,5 +817,201 @@ def complete_training_task(task_id: int, db: Session = Depends(get_db), user_id=
     return {
         "message": "Task completed",
         "task_id": task_id,
-        "next_unlocked": next_task.id if next_task else None
+        "xp_earned": task.xp if hasattr(task, "xp") else 50,
+        "total_xp": total_xp,
+        "exercises_done": done_count,
+        "user_level": user_level,
+        "difficulty_upgraded": difficulty_upgraded,
+        "next_unlocked": next_task.id if next_task else None,
+        "next_difficulty": next_task.difficulty if next_task else None,
+    }
+
+
+# -------------------------
+# 🧠 EXERCISE CONTENT API (NEW)
+# Returns structured content for a specific exercise
+# -------------------------
+
+@router.get("/exercise-content/{task_id}")
+def get_exercise_content_api(task_id: int, db: Session = Depends(get_db), user_id=Depends(get_current_user)):
+    rate_limit(f"exercise_content:{user_id}", limit=30, window=60)
+    
+    from utils.exercise_content import get_exercise_content
+    from utils.training_generator_V2 import extract_confusions_from_db
+
+    # Fetch the task
+    task = db.query(models.TrainingTask)\
+        .join(models.TrainingPlan)\
+        .filter(
+            models.TrainingTask.id == task_id,
+            models.TrainingPlan.user_id == user_id
+        ).first()
+
+    if not task:
+        return {"error": "Task not found"}
+
+    # Determine exercise mode from task content or type
+    mode = None
+    
+    # Check if task has stored content with a mode
+    if task.content and isinstance(task.content, dict):
+        mode = task.content.get("mode")
+    
+    # Fallback: map task_type + task_name → mode
+    if not mode:
+        name_lower = (task.task_name or "").lower()
+        type_lower = (task.task_type or "").lower()
+        
+        # Reading exercises
+        if "reading flow" in name_lower or "follow" in name_lower:
+            mode = "follow_highlight"
+        elif "word recognition" in name_lower or "flashcard" in name_lower:
+            mode = "flashcards"
+        elif "regression" in name_lower or "no backtrack" in name_lower:
+            mode = "no_backtrack"
+        elif "speed reading" in name_lower:
+            mode = "timed_read"
+        elif "word pair" in name_lower or "pair match" in name_lower:
+            mode = "pair_match"
+        elif "sentence completion" in name_lower or "fill" in name_lower:
+            mode = "fill_blank"
+        elif "phoneme" in name_lower:
+            mode = "phoneme_split"
+        elif "comprehension" in name_lower:
+            mode = "comprehension"
+        
+        # Writing exercises
+        elif "letter pattern" in name_lower:
+            mode = "letter_pattern"
+        elif "confus" in name_lower and "letter" in name_lower:
+            mode = "confusion_drill"
+        elif "word copy" in name_lower or "copy accuracy" in name_lower:
+            mode = "copy_exact"
+        elif "sentence writing" in name_lower:
+            mode = "sentence_write"
+        elif "dictation" in name_lower:
+            mode = "dictation"
+        elif "letter size" in name_lower or "size consistency" in name_lower:
+            mode = "size_control"
+        elif "speed writing" in name_lower:
+            mode = "speed_write"
+        elif "memory recall" in name_lower or "memory write" in name_lower:
+            mode = "memory_write"
+        
+        # Motor exercises
+        elif "rhythm" in name_lower or "tap" in name_lower:
+            mode = "tap_sync"
+        elif "smooth" in name_lower or "stroke" in name_lower:
+            mode = "smooth_trace"
+        elif "pressure" in name_lower:
+            mode = "pressure_control"
+        elif "fine motor" in name_lower or "precision" in name_lower or "coordination" in name_lower:
+            mode = "precision_draw"
+        
+        # Cognitive exercises
+        elif "visual memory" in name_lower:
+            mode = "visual_memory"
+        elif "multisensory" in name_lower:
+            mode = "multisensory"
+        elif "pattern" in name_lower and "recognition" in name_lower:
+            mode = "pattern_spot"
+        
+        # Adaptive exercises
+        elif "mirror" in name_lower or "discrimination" in name_lower:
+            mode = "reversal_drill"
+        elif "completion" in name_lower:
+            mode = "completion_drill"
+        elif "problem word" in name_lower:
+            mode = "word_drill"
+        elif "confusion pair" in name_lower or "adaptive confusion" in name_lower:
+            mode = "confusion_drill"
+        
+        # Final fallback by type
+        elif type_lower == "eye":
+            mode = "follow_highlight"
+        elif type_lower == "pen":
+            mode = "copy_exact"
+        elif type_lower == "rhythm":
+            mode = "tap_sync"
+        else:
+            mode = "copy_exact"
+
+    # Build kwargs for adaptive exercises (pass user error data)
+    kwargs = {}
+    if mode in ("reversal_drill", "confusion_pair_drill", "word_drill"):
+        try:
+            confusion_pairs, error_stats = extract_confusions_from_db(db, user_id)
+            if mode in ("reversal_drill", "confusion_pair_drill"):
+                kwargs["confusion_pairs"] = confusion_pairs if confusion_pairs else None
+                if mode == "confusion_pair_drill":
+                    kwargs["pairs"] = confusion_pairs if confusion_pairs else None
+            elif mode == "word_drill":
+                kwargs["problem_words"] = error_stats.get("problem_words") if error_stats else None
+        except:
+            pass
+
+    # Generate content
+    content = get_exercise_content(mode, **kwargs)
+    
+    return {
+        "task_id": task_id,
+        "task_name": task.task_name,
+        "task_type": task.task_type,
+        "difficulty": task.difficulty,
+        "duration": task.duration,
+        "xp": task.xp,
+        "mode": mode,
+        "content": content
+    }
+
+
+@router.get("/exercise-modes")
+def list_exercise_modes(user_id=Depends(get_current_user)):
+    """List all available exercise types with descriptions"""
+    from utils.exercise_content import get_all_exercise_modes
+    
+    modes = get_all_exercise_modes()
+    
+    mode_info = {
+        "follow_highlight": {"category": "reading", "name": "Reading Flow", "icon": "👁️"},
+        "flashcards": {"category": "reading", "name": "Word Recognition", "icon": "⚡"},
+        "no_backtrack": {"category": "reading", "name": "Regression Reduction", "icon": "➡️"},
+        "timed_read": {"category": "reading", "name": "Speed Reading", "icon": "🏃"},
+        "pair_match": {"category": "reading", "name": "Word Pair Matching", "icon": "🔗"},
+        "fill_blank": {"category": "reading", "name": "Sentence Completion", "icon": "📝"},
+        "phoneme_split": {"category": "reading", "name": "Phoneme Awareness", "icon": "🔊"},
+        "comprehension": {"category": "reading", "name": "Comprehension", "icon": "📖"},
+        
+        "letter_pattern": {"category": "writing", "name": "Letter Patterns", "icon": "✏️"},
+        "confusion_drill": {"category": "writing", "name": "Confusing Letters", "icon": "🔄"},
+        "copy_exact": {"category": "writing", "name": "Word Copy", "icon": "📋"},
+        "sentence_write": {"category": "writing", "name": "Sentence Writing", "icon": "✍️"},
+        "dictation": {"category": "writing", "name": "Dictation", "icon": "🎧"},
+        "size_control": {"category": "writing", "name": "Letter Sizing", "icon": "📏"},
+        "speed_write": {"category": "writing", "name": "Speed Writing", "icon": "💨"},
+        "memory_write": {"category": "writing", "name": "Memory Recall", "icon": "🧠"},
+        
+        "tap_sync": {"category": "motor", "name": "Rhythm Timing", "icon": "🎵"},
+        "smooth_trace": {"category": "motor", "name": "Stroke Smoothness", "icon": "〰️"},
+        "pressure_control": {"category": "motor", "name": "Pressure Control", "icon": "🎯"},
+        "precision_draw": {"category": "motor", "name": "Fine Motor", "icon": "✨"},
+        
+        "visual_memory": {"category": "cognitive", "name": "Visual Memory", "icon": "👀"},
+        "multisensory": {"category": "cognitive", "name": "Multisensory", "icon": "🌈"},
+        "pattern_spot": {"category": "cognitive", "name": "Pattern Recognition", "icon": "🧩"},
+        
+        "reversal_drill": {"category": "adaptive", "name": "Mirror Discrimination", "icon": "🪞"},
+        "completion_drill": {"category": "adaptive", "name": "Letter Completion", "icon": "🔧"},
+        "word_drill": {"category": "adaptive", "name": "Problem Words", "icon": "🎯"},
+        "confusion_pair_drill": {"category": "adaptive", "name": "Confusion Pairs", "icon": "🔀"},
+    }
+    
+    return {
+        "total_modes": len(modes),
+        "modes": [
+            {
+                "mode": m,
+                **(mode_info.get(m, {"category": "other", "name": m, "icon": "📌"}))
+            } for m in modes
+        ]
     }

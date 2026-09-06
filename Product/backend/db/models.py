@@ -13,6 +13,15 @@ class User(Base):
     password = Column(String)
     google_id = Column(String, nullable=True)  # add after password
 
+    # New demographic fields
+    age = Column(Integer, nullable=True)
+    gender = Column(String, nullable=True)
+    role = Column(String, nullable=True) # teacher, doctor, parent, student, etc.
+    parent_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # linked parent/teacher
+    mobile_number = Column(String, nullable=True)
+    country_code = Column(String, nullable=True, default="+1")
+    share_key = Column(String, unique=True, nullable=True)  # unique key for portal linking
+ 
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -26,6 +35,7 @@ class Assessment(Base):
 
     eye_data = Column(JSON)
     pen_data = Column(JSON)
+    errors = Column(JSON, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -92,7 +102,7 @@ class TrainingPlan(Base):
     __tablename__ = "training_plans"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     level = Column(String)  # mild / moderate / severe
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -100,13 +110,14 @@ class TrainingTask(Base):
     __tablename__ = "training_tasks"
 
     id = Column(Integer, primary_key=True, index=True)
-    plan_id = Column(Integer, ForeignKey("training_plans.id"))
+    plan_id = Column(Integer, ForeignKey("training_plans.id", ondelete="CASCADE"))
     task_name = Column(String)
     task_type = Column(String)  # eye / pen / rhythm
     difficulty = Column(String)
     duration = Column(String)
     xp = Column(Integer, default=50)
     status = Column(String, default="pending")  # pending / done
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     # 🧠 Adaptive intelligence fields (NEW)
     is_adaptive = Column(Boolean, default=False)
@@ -119,11 +130,12 @@ class AssessmentSession(Base):
     __tablename__ = "assessment_sessions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     status = Column(String, default="started")  # started / completed
 
     eye_data = Column(JSON, nullable=True)
     pen_data = Column(JSON, nullable=True)
+    errors = Column(JSON, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -173,7 +185,7 @@ class UserWeaknessProfile(Base):
     __tablename__ = "user_weakness_profile"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True)
 
     reading_score = Column(Float, default=0)
     writing_score = Column(Float, default=0)
@@ -186,7 +198,7 @@ class IssueHistory(Base):
     __tablename__ = "issue_history"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
 
     reading_score = Column(Float)
     writing_score = Column(Float)
@@ -203,8 +215,8 @@ class FeatureAttribution(Base):
     __tablename__ = "feature_attributions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), index=True)
-    session_id = Column(Integer, ForeignKey("assessment_sessions.id"), index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_id = Column(Integer, ForeignKey("assessment_sessions.id", ondelete="CASCADE"), index=True)
 
     feature_name = Column(String, index=True)
     impact = Column(Float)
@@ -213,4 +225,68 @@ class FeatureAttribution(Base):
     feature_type = Column(String, nullable=True)   # eye / pen / rhythm
     direction = Column(String, nullable=True)      # positive / negative
 
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class AdvancedEyeMetrics(Base):
+    __tablename__ = "advanced_eye_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, nullable=False)
+    session_id = Column(Integer, nullable=False)
+
+    avg_fixation_duration = Column(Float, default=0)
+    fixation_variance = Column(Float, default=0)
+    avg_saccade_length = Column(Float, default=0)
+    regression_count = Column(Float, default=0)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+class UserSetting(Base):
+    __tablename__ = "user_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+
+    push_notifications = Column(Boolean, default=True)
+    daily_reminders = Column(Boolean, default=True)
+    weekly_reports = Column(Boolean, default=False)
+
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# -------------------------
+# 🧠 PER-WORD ASSESSMENT ERRORS (NEW)
+# Stores what word was given vs what user wrote — drives adaptive training
+# -------------------------
+class AssessmentError(Base):
+    __tablename__ = "assessment_errors"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_id = Column(Integer, ForeignKey("assessment_sessions.id", ondelete="CASCADE"), index=True)
+
+    step = Column(Integer)               # 1=mirror, 2=bank, 3=intro, 4=audio, 5=matching
+    sub_step = Column(Integer, default=0)
+    target_word = Column(String)          # what was given to the user
+    actual_word = Column(String)          # what the user wrote (OCR result)
+    similarity = Column(Float, default=0) # OCR similarity score
+    is_correct = Column(Boolean, default=False)
+
+    # Derived confusion analysis
+    confused_letters = Column(JSON, nullable=True)  # e.g. [{"expected": "b", "actual": "d"}]
+    error_type = Column(String, nullable=True)       # reversal / omission / substitution / addition
+    confused_pairs = Column(JSON, nullable=True)     # e.g. ["b/d", "p/q"]
+    confusion_type = Column(String, nullable=True)   # reversal / omission / substitution
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AnalyticsEvent(Base):
+    __tablename__ = "analytics_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    event_type = Column(String, index=True)       # exercise_started, assessment_completed, page_viewed
+    event_data = Column(JSON, nullable=True)       # arbitrary event metadata
+    page = Column(String, nullable=True)           # which page the event occurred on
     created_at = Column(DateTime, default=datetime.utcnow)
