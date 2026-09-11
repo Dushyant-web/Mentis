@@ -8,7 +8,6 @@ interface Letter {
   x: number;
   y: number;
   baseSize: number;
-  currentSize: number;
   rotation: number;
   color: string;
   glows: boolean;
@@ -33,16 +32,33 @@ const COLORS = [
   "rgb(255, 237, 213)",  // orange-100
 ];
 
+const LETTER_COUNT = 60;
+
 export function JumbleLetters() {
   const [letters, setLetters] = useState<Letter[]>([]);
-  const [scrollCount, setScrollCount] = useState(0);
   const [pageHeight, setPageHeight] = useState(0);
-  const lastScrollY = useRef(0);
-  const scrollThreshold = useRef(0);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const nodesRef = useRef<(HTMLSpanElement | null)[]>([]);
+  // Live drift positions, mutated per frame. Kept out of state on purpose:
+  // calling setLetters() every frame re-rendered 60 nodes at 60fps, which pegged
+  // the main thread hard enough that the browser stopped advancing CSS animation
+  // clocks — leaving the scroll-story scenes frozen at their `from` keyframe.
+  const posRef = useRef<{ x: number; y: number }[]>([]);
   const animationRef = useRef<number>(0);
   const timeRef = useRef(0);
+  const pageHeightRef = useRef(0);
+  const lastScrollY = useRef(0);
+  const scrollThreshold = useRef(0);
+  const scrollCountRef = useRef(0);
+  const sizeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Track full page height
+  useEffect(() => {
+    pageHeightRef.current = pageHeight;
+  }, [pageHeight]);
+
+  // Track full page height. Rounded to the nearest 200px so ordinary layout
+  // jitter does not count as a change and regenerate every letter.
   useEffect(() => {
     const updatePageHeight = () => {
       const fullHeight = Math.max(
@@ -52,172 +68,151 @@ export function JumbleLetters() {
         document.documentElement.scrollHeight,
         document.documentElement.offsetHeight
       );
-      setPageHeight(fullHeight);
+      const bucketed = Math.round(fullHeight / 200) * 200;
+      setPageHeight((prev) => (prev === bucketed ? prev : bucketed));
     };
 
     updatePageHeight();
-    
-    // Update on resize and after content loads
     window.addEventListener("resize", updatePageHeight);
-    const resizeObserver = new ResizeObserver(updatePageHeight);
-    resizeObserver.observe(document.body);
-    
-    // Also update periodically to catch dynamic content
-    const interval = setInterval(updatePageHeight, 1000);
-
+    const interval = setInterval(updatePageHeight, 2000);
     return () => {
       window.removeEventListener("resize", updatePageHeight);
-      resizeObserver.disconnect();
       clearInterval(interval);
     };
   }, []);
 
-  // Generate random letters distributed across full page height
+  // Generate the letters once per page-height bucket.
   useEffect(() => {
     if (pageHeight === 0) return;
 
-    const generateLetters = () => {
-      const newLetters: Letter[] = [];
-      const letterCount = 60; // More letters for full page coverage
-
-      for (let i = 0; i < letterCount; i++) {
-        const baseSize = Math.random() * 50 + 24; // 24-74px
-        newLetters.push({
-          id: i,
-          char: DYSLEXIA_LETTERS[Math.floor(Math.random() * DYSLEXIA_LETTERS.length)],
-          x: Math.random() * 100,
-          y: Math.random() * 100, // Percentage of full page height
-          baseSize,
-          currentSize: baseSize,
-          rotation: Math.random() * 60 - 30, // -30 to 30 degrees
-          color: COLORS[Math.floor(Math.random() * COLORS.length)],
-          glows: Math.random() > 0.6, // 40% chance to glow
-          floatOffset: Math.random() * Math.PI * 2,
-          floatSpeed: 0.3 + Math.random() * 1.2,
-          driftX: (Math.random() - 0.5) * 0.015,
-          driftY: (Math.random() - 0.5) * 0.008,
-        });
-      }
-      return newLetters;
-    };
-
-    setLetters(generateLetters());
+    const newLetters: Letter[] = [];
+    for (let i = 0; i < LETTER_COUNT; i++) {
+      newLetters.push({
+        id: i,
+        char: DYSLEXIA_LETTERS[Math.floor(Math.random() * DYSLEXIA_LETTERS.length)],
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        baseSize: Math.random() * 50 + 24,
+        rotation: Math.random() * 60 - 30,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        glows: Math.random() > 0.6,
+        floatOffset: Math.random() * Math.PI * 2,
+        floatSpeed: 0.3 + Math.random() * 1.2,
+        driftX: (Math.random() - 0.5) * 0.015,
+        driftY: (Math.random() - 0.5) * 0.008,
+      });
+    }
+    posRef.current = newLetters.map((l) => ({ x: l.x, y: l.y }));
+    setLetters(newLetters);
   }, [pageHeight]);
 
-  // Animation loop for floating effect
+  // Drift + float, written straight to the DOM. Position is expressed as a
+  // transform offset from each letter's static left/top, so no layout runs.
   useEffect(() => {
-    const animate = () => {
-      timeRef.current += 0.016; // ~60fps
-      
-      setLetters(prev => prev.map(letter => {
-        // Slow drift
-        let newX = letter.x + letter.driftX;
-        let newY = letter.y + letter.driftY;
-        
-        // Wrap around edges
-        if (newX > 105) newX = -5;
-        if (newX < -5) newX = 105;
-        if (newY > 102) newY = -2;
-        if (newY < -2) newY = 102;
+    if (letters.length === 0) return;
 
-        return {
-          ...letter,
-          x: newX,
-          y: newY,
-        };
-      }));
+    const animate = () => {
+      timeRef.current += 0.016;
+      const width = containerRef.current?.offsetWidth ?? window.innerWidth;
+      const height = pageHeightRef.current || 1;
+
+      for (let i = 0; i < letters.length; i++) {
+        const letter = letters[i];
+        const pos = posRef.current[i];
+        const node = nodesRef.current[i];
+        if (!pos || !node) continue;
+
+        pos.x += letter.driftX;
+        pos.y += letter.driftY;
+        if (pos.x > 105) pos.x = -5;
+        if (pos.x < -5) pos.x = 105;
+        if (pos.y > 102) pos.y = -2;
+        if (pos.y < -2) pos.y = 102;
+
+        const floatY = Math.sin(timeRef.current * letter.floatSpeed + letter.floatOffset) * 10;
+        const floatX = Math.cos(timeRef.current * letter.floatSpeed * 0.7 + letter.floatOffset) * 6;
+        const driftPxX = ((pos.x - letter.x) / 100) * width;
+        const driftPxY = ((pos.y - letter.y) / 100) * height;
+        const rotation = letter.rotation + Math.sin(timeRef.current * 0.5) * 3;
+
+        node.style.transform =
+          `translate(${floatX + driftPxX}px, ${floatY + driftPxY}px) rotate(${rotation}deg)`;
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     };
 
     animationRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRef.current);
-  }, []);
+  }, [letters]);
 
-  // Handle scroll for size changes
+  // Pulse letter sizes as the page scrolls, then settle back. Font size is set
+  // directly too — this used to run through state and re-render every letter.
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
     const scrollDelta = Math.abs(currentScrollY - lastScrollY.current);
-    
-    // Only trigger on significant scroll (every ~100px)
-    if (scrollDelta > 80) {
-      scrollThreshold.current += scrollDelta;
-      
-      if (scrollThreshold.current > 100) {
-        setScrollCount(prev => prev + 1);
-        scrollThreshold.current = 0;
-        
-        // Update letter sizes based on even/odd scroll count
-        setLetters(prev => prev.map(letter => {
-          const isEvenScroll = (scrollCount + 1) % 2 === 0;
-          const sizeMultiplier = isEvenScroll ? 1.25 : 0.85;
-          const targetSize = letter.baseSize * sizeMultiplier;
-          
-          return {
-            ...letter,
-            currentSize: targetSize,
-          };
-        }));
-      }
-      
-      lastScrollY.current = currentScrollY;
-    }
-  }, [scrollCount]);
+    if (scrollDelta <= 80) return;
+
+    scrollThreshold.current += scrollDelta;
+    lastScrollY.current = currentScrollY;
+    if (scrollThreshold.current <= 100) return;
+
+    scrollThreshold.current = 0;
+    scrollCountRef.current += 1;
+    const multiplier = scrollCountRef.current % 2 === 0 ? 1.25 : 0.85;
+
+    nodesRef.current.forEach((node, i) => {
+      const letter = letters[i];
+      if (node && letter) node.style.fontSize = `${letter.baseSize * multiplier}px`;
+    });
+
+    if (sizeTimeout.current) clearTimeout(sizeTimeout.current);
+    sizeTimeout.current = setTimeout(() => {
+      nodesRef.current.forEach((node, i) => {
+        const letter = letters[i];
+        if (node && letter) node.style.fontSize = `${letter.baseSize}px`;
+      });
+    }, 800);
+  }, [letters]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (sizeTimeout.current) clearTimeout(sizeTimeout.current);
+    };
   }, [handleScroll]);
 
-  // Smooth size transition back to base after scroll stops
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLetters(prev => prev.map(letter => ({
-        ...letter,
-        currentSize: letter.baseSize,
-      })));
-    }, 800);
-
-    return () => clearTimeout(timeout);
-  }, [scrollCount]);
-
   return (
-    <div 
-      className="absolute inset-x-0 top-0 pointer-events-none overflow-hidden z-0" 
+    <div
+      ref={containerRef}
+      className="absolute inset-x-0 top-0 pointer-events-none overflow-hidden z-0"
       style={{ height: `${pageHeight}px` }}
       aria-hidden="true"
     >
-      {letters.map((letter) => {
-        const floatY = Math.sin(timeRef.current * letter.floatSpeed + letter.floatOffset) * 10;
-        const floatX = Math.cos(timeRef.current * letter.floatSpeed * 0.7 + letter.floatOffset) * 6;
-        const topPosition = (letter.y / 100) * pageHeight;
-        
-        return (
-          <span
-            key={letter.id}
-            className="absolute font-display font-bold select-none"
-            style={{
-              left: `${letter.x}%`,
-              top: `${topPosition}px`,
-              fontSize: `${letter.currentSize}px`,
-              color: letter.color,
-              opacity: letter.glows ? 0.4 : 0.2,
-              transform: `
-                translate(${floatX}px, ${floatY}px)
-                rotate(${letter.rotation + Math.sin(timeRef.current * 0.5) * 3}deg)
-              `,
-              transition: "font-size 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
-              textShadow: letter.glows
-                ? `0 0 25px ${letter.color}, 0 0 50px ${letter.color}, 0 0 75px ${letter.color}`
-                : "none",
-              filter: letter.glows ? "blur(0.5px)" : "none",
-              willChange: "transform, font-size",
-            }}
-          >
-            {letter.char}
-          </span>
-        );
-      })}
+      {letters.map((letter, i) => (
+        <span
+          key={letter.id}
+          ref={(el) => { nodesRef.current[i] = el; }}
+          className="absolute font-display font-bold select-none"
+          style={{
+            left: `${letter.x}%`,
+            top: `${(letter.y / 100) * pageHeight}px`,
+            fontSize: `${letter.baseSize}px`,
+            color: letter.color,
+            opacity: letter.glows ? 0.4 : 0.2,
+            transform: `rotate(${letter.rotation}deg)`,
+            transition: "font-size 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            textShadow: letter.glows
+              ? `0 0 25px ${letter.color}, 0 0 50px ${letter.color}, 0 0 75px ${letter.color}`
+              : "none",
+            filter: letter.glows ? "blur(0.5px)" : "none",
+            willChange: "transform",
+          }}
+        >
+          {letter.char}
+        </span>
+      ))}
     </div>
   );
 }

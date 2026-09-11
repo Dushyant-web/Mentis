@@ -16,7 +16,10 @@ export function ScrollStory() {
   const [currentScene, setCurrentScene] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const totalHeight = rect.height - window.innerHeight;
@@ -26,9 +29,21 @@ export function ScrollStory() {
       const scene = Math.min(SCENES.length - 1, Math.max(0, Math.floor(progress * SCENES.length)));
       setCurrentScene(scene);
     };
+
+    // Coalesce to one measurement per frame. Scroll events fire far faster than
+    // that, and re-rendering the active scene on every one of them is what made
+    // the story stutter.
+    const handleScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(measure);
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    measure();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   // 0→1 progress within the active scene's band (drives parallax transforms).

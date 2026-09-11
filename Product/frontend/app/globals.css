@@ -144,9 +144,13 @@ html {
   scroll-behavior: smooth;
 }
 
-/* iOS/iPad: stop stray horizontal overflow from jamming vertical scroll */
+/* iOS/iPad: stop stray horizontal overflow from jamming vertical scroll.
+   `clip`, not `hidden`: overflow-x:hidden forces overflow-y to `auto`, which turns
+   body into a scroll container and stops `position: sticky` from pinning to the
+   viewport — that is what left the scroll-story scenes scrolled off-screen.
+   `clip` cuts the overflow without creating a scroll container. */
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
   -webkit-text-size-adjust: 100%;
 }
