@@ -1,0 +1,19 @@
+# Netlify build configuration.
+#
+# This file overrides the dashboard settings, so the deploy does not depend on
+# UI fields being right. `publish` is resolved relative to `base`.
+#
+# The plugin is declared explicitly: auto-detection is unreliable when the app
+# lives in a subdirectory, and without the plugin Netlify serves .next as a
+# plain static folder — which 404s every route and exposes the build manifests.
+
+[build]
+  base    = "Product/frontend"
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "22"
