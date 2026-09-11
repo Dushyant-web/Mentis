@@ -6,7 +6,7 @@ import { EyeTrackingStatus } from "@/hooks/useEyeTracking";
 import { Eye, EyeOff, UserMinus } from "lucide-react";
 
 interface TrackingPreviewProps {
-  videoRef: React.RefObject<HTMLVideoElement>;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
   status: EyeTrackingStatus;
   className?: string;
 }

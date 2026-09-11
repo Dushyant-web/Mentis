@@ -1,5 +1,8 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+/** Google OAuth web client ID. Set NEXT_PUBLIC_GOOGLE_CLIENT_ID for the deployed domain. */
+export const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
+
 /**
  * Standardizes authentication header injection for both raw fetch and api wrapper.
  */

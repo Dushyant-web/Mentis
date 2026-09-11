@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react";
 
-import { api } from "@/lib/api";
+import { api, GOOGLE_CLIENT_ID } from "@/lib/api";
 import { setToken, setUser } from "@/lib/auth";
 
 declare global {
@@ -32,9 +32,13 @@ export default function LoginPage() {
     }
 
     const initGoogle = () => {
+      if (!GOOGLE_CLIENT_ID) {
+        console.error("NEXT_PUBLIC_GOOGLE_CLIENT_ID is not set — Google sign-in is disabled.");
+        return;
+      }
       if (window.google) {
         window.google.accounts.id.initialize({
-          client_id: "815960088211-nbbn9898ne707peujvq7lqcvkflf5ibs.apps.googleusercontent.com",
+          client_id: GOOGLE_CLIENT_ID,
           callback: handleGoogleResponse,
           ux_mode: 'popup',
         });

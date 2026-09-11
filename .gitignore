@@ -10,6 +10,8 @@ dataset/raw/*
 # -------------------------
 *.zip
 *.csv
+# ...but the exercise content datasets are small and required at runtime
+!Product/backend/dataset/*.csv
 *.pkl
 *.h5
 *.pt
@@ -33,6 +35,9 @@ __pycache__/
 # -------------------------
 venv/
 .env
+.env.local
+.env*.local
+!.env.example
 .DS_Store
 
 # -------------------------
@@ -46,6 +51,7 @@ venv/
 # -------------------------
 dist/
 build/
+*.tsbuildinfo
 
 # -------------------------
 # 🔥 NODE (frontend inside same repo)

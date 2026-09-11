@@ -5,6 +5,7 @@
  * Tracks exercise starts, completions, page views, session duration
  */
 import { useCallback, useEffect, useRef } from "react";
+import { API_BASE_URL } from "@/lib/api";
 
 export function useAnalytics() {
   const sessionStart = useRef(Date.now());
@@ -14,7 +15,7 @@ export function useAnalytics() {
       const token = localStorage.getItem("token");
       if (!token) return;
       
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/analytics/event`, {
+      await fetch(`${API_BASE_URL}/analytics/event`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

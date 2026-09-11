@@ -15,6 +15,9 @@ import numpy as np
 from utils.ocr_service import analyze_handwriting
 from utils.profile_manager import get_or_create_weakness_profile
 from utils.cache import cache_invalidate
+from pathlib import Path
+
+DATASET_DIR = Path(__file__).resolve().parent.parent / "dataset"
 
 model = get_model()
 scaler = get_scaler()
@@ -106,7 +109,7 @@ def get_assessment_content(db: Session = Depends(get_db)):
     # 2. Word Bank (20 words from AUDIO.csv)
     words = []
     try:
-        path = os.path.join("dataset", "AUDIO.csv")
+        path = DATASET_DIR / "AUDIO.csv"
         if os.path.exists(path):
             with open(path, "r") as f:
                 reader = csv.DictReader(f)
@@ -119,7 +122,7 @@ def get_assessment_content(db: Session = Depends(get_db)):
     # 3. Matching Questions (10 from MATCHING_MIXED.json)
     questions = []
     try:
-        path = os.path.join("dataset", "MATCHING_MIXED.json")
+        path = DATASET_DIR / "MATCHING_MIXED.json"
         if os.path.exists(path):
             with open(path, "r") as f:
                 all_q = json.load(f)
