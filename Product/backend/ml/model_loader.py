@@ -16,8 +16,13 @@ MODEL_DIR = os.path.join(BASE_DIR, "..", "model")
 MODEL_PATH = os.path.join(MODEL_DIR, "dyslexia_model.pkl")
 SCALER_PATH = os.path.join(MODEL_DIR, "scaler.pkl")
 
-MODEL_URL = os.getenv("MODEL_URL")
-SCALER_URL = os.getenv("SCALER_URL")
+# Published alongside the source as release assets. These are public build
+# artifacts of this repo, not secrets, so they make a safe default — set
+# MODEL_URL / SCALER_URL to override for a different deployment.
+_RELEASE = "https://github.com/Dushyant-web/Mentis/releases/download/MENTIS"
+
+MODEL_URL = os.getenv("MODEL_URL") or f"{_RELEASE}/dyslexia_model.pkl"
+SCALER_URL = os.getenv("SCALER_URL") or f"{_RELEASE}/scaler.pkl"
 
 # joblib writes protocol-4 pickles, which always begin with this byte.
 _PICKLE_MAGIC = b"\x80"
@@ -37,9 +42,15 @@ def _download(url: str, path: str, label: str) -> None:
             None,
         )
         if token is None:
+            hint = (
+                " Google Drive cannot serve a file this large without a virus-scan "
+                "interstitial — use a GitHub release asset instead, or unset the "
+                "variable to fall back to this project's own release."
+                if "drive.google.com" in url
+                else " Point the variable straight at the .pkl and make sure it is public."
+            )
             raise RuntimeError(
-                f"{label}: {url} returned a web page instead of a file. "
-                "If this is a Google Drive link, set its sharing to 'Anyone with the link'."
+                f"{label}: {url} returned a web page instead of a file.{hint}"
             )
         response = session.get(url, params={"confirm": token}, stream=True, timeout=60)
         response.raise_for_status()
