@@ -55,7 +55,15 @@ _origins_env = os.getenv(
     "ALLOWED_ORIGINS",
     "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001",
 )
-ALLOWED_ORIGINS = [o.strip() for o in _origins_env.split(",") if o.strip()]
+# Browsers send Origin without a trailing slash, so a configured value that has
+# one can never match and every request fails preflight. Normalise instead of
+# relying on whoever typed the env var getting it exactly right.
+ALLOWED_ORIGINS = [
+    origin
+    for origin in (o.strip().rstrip("/") for o in _origins_env.split(","))
+    if origin
+]
+print(f"🔓 CORS allowed origins: {ALLOWED_ORIGINS}")
 
 app.add_middleware(
     CORSMiddleware,

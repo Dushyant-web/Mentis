@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import { Nunito, Fredoka, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const nunito = Nunito({ 
@@ -61,7 +60,6 @@ export default function RootLayout({
        <body className="font-sans antialiased overflow-x-clip">
         <script src="https://accounts.google.com/gsi/client" async defer></script>
          {children}
-         <Analytics />
        </body>
     </html>
   )
