@@ -12,7 +12,7 @@ plan for the teacher and the parent.
 | | |
 |---|---|
 | **Live demo** | _add deployed URL_ |
-| **Stack** | Next.js 15 · FastAPI · PostgreSQL · Redis · scikit-learn |
+| **Stack** | Next.js 16 · FastAPI · PostgreSQL · Redis · scikit-learn |
 | **Status** | Working prototype — 38 API endpoints, 17 tables, 16 screens |
 
 ---
@@ -207,7 +207,7 @@ Product/
 │   ├── ml/             model loading and inference
 │   ├── utils/          feature_builder (23 features), OCR ensemble, exercise content
 │   └── model/          dyslexia_model.pkl + scaler.pkl  (not in git — 123 MB)
-└── frontend/           Next.js 15 App Router
+└── frontend/           Next.js 16 App Router
     ├── app/            16 screens
     ├── hooks/          7 capture hooks (eye tracking, pen capture, analytics…)
     └── components/     57 UI primitives
