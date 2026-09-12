@@ -27,7 +27,7 @@ export const usePenTracking = () => {
   const sessionBannerRef = useRef(false);
   const lastPtRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
-  const startStroke = (x: number, y: number, pressure: number = 0.5) => {
+  const startStroke = (x: number, y: number, pressure: number = 0.5, tiltX = 0, tiltY = 0) => {
     if (!sessionBannerRef.current) {
       banner("MENTIS PEN TELEMETRY — LIVE CAPTURE");
       sessionBannerRef.current = true;
@@ -42,13 +42,13 @@ export const usePenTracking = () => {
       "color:#e0742f;font-weight:bold",
       `@ (${Math.round(x)}, ${Math.round(y)})  pressure:${pressure.toFixed(3)}`
     );
-    strokesRef.current.push({ x, y, time: Date.now(), pressure, type: "start" });
+    strokesRef.current.push({ x, y, time: Date.now(), pressure, tiltX, tiltY, type: "start" });
   };
 
-  const moveStroke = (x: number, y: number, pressure: number = 0.5) => {
+  const moveStroke = (x: number, y: number, pressure: number = 0.5, tiltX = 0, tiltY = 0) => {
     if (!isDrawingRef.current) return;
     const now = Date.now();
-    strokesRef.current.push({ x, y, time: now, pressure, type: "move" });
+    strokesRef.current.push({ x, y, time: now, pressure, tiltX, tiltY, type: "move" });
 
     // instantaneous speed (px/s) — varies on any device, looks alive
     let speed = 0;
@@ -68,10 +68,10 @@ export const usePenTracking = () => {
     }
   };
 
-  const endStroke = (x: number, y: number, pressure: number = 0.5) => {
+  const endStroke = (x: number, y: number, pressure: number = 0.5, tiltX = 0, tiltY = 0) => {
     if (!isDrawingRef.current) return;
     isDrawingRef.current = false;
-    strokesRef.current.push({ x, y, time: Date.now(), pressure, type: "end" });
+    strokesRef.current.push({ x, y, time: Date.now(), pressure, tiltX, tiltY, type: "end" });
 
     const m = computeStrokeMetrics(strokesRef.current.slice(strokeStartIdxRef.current));
     console.log(
@@ -89,6 +89,7 @@ export const usePenTracking = () => {
       "tremor index": m.tremor,
       "straightness 0-1": m.straightness,
       "pressure min/avg/max": `${m.pMin} / ${m.pAvg} / ${m.pMax}`,
+      "tilt x/y (deg)": `${m.tiltX} / ${m.tiltY}`,
     });
   };
 
@@ -105,6 +106,7 @@ export const usePenTracking = () => {
 
 function computeStrokeMetrics(pts: any[]) {
   const pressures = pts.map((p) => p.pressure);
+  const avg = (a: number[]) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   const durMs = pts[pts.length - 1].time - pts[0].time || 1;
 
   let dist = 0;
@@ -148,5 +150,7 @@ function computeStrokeMetrics(pts: any[]) {
     pMin: +Math.min(...pressures).toFixed(3),
     pAvg: +(pressures.reduce((a, b) => a + b, 0) / pressures.length).toFixed(3),
     pMax: +Math.max(...pressures).toFixed(3),
+    tiltX: +avg(pts.map((p) => p.tiltX ?? 0)).toFixed(1),
+    tiltY: +avg(pts.map((p) => p.tiltY ?? 0)).toFixed(1),
   };
 }

@@ -133,7 +133,7 @@ export default function WritingTestPage() {
     isDrawingRef.current = true;
     setIsDrawing(true);
 
-    startStroke(pos.x, pos.y, e.pressure || 0.5);
+    startStroke(pos.x, pos.y, e.pressure || 0.5, e.tiltX ?? 0, e.tiltY ?? 0);
 
     // Dot so a single tap leaves a mark.
     ctx.fillStyle = "#1a1a1a";
@@ -161,7 +161,7 @@ export default function WritingTestPage() {
 
     for (const s of samples) {
       const pos = getPos(s.clientX, s.clientY);
-      moveStroke(pos.x, pos.y, (s as PointerEvent).pressure || 0.5);
+      moveStroke(pos.x, pos.y, (s as PointerEvent).pressure || 0.5, (s as PointerEvent).tiltX ?? 0, (s as PointerEvent).tiltY ?? 0);
 
       // Quadratic smoothing: draw from the last midpoint to the new midpoint using
       // the previous raw point as the control point — turns jagged segments into a curve.
@@ -196,7 +196,7 @@ export default function WritingTestPage() {
       ctx.moveTo(lastMidRef.current.x, lastMidRef.current.y);
       ctx.lineTo(pos.x, pos.y);
       ctx.stroke();
-      endStroke(pos.x, pos.y, e.pressure || 0.5);
+      endStroke(pos.x, pos.y, e.pressure || 0.5, e.tiltX ?? 0, e.tiltY ?? 0);
     }
   };
 
