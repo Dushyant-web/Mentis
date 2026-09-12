@@ -31,6 +31,34 @@ export const metadata: Metadata = {
   description: 'MENTIS provides early dyslexia screening through innovative eye-tracking and smart pen technology. Help your child unlock their full learning potential with research-backed assessments.',
   generator: 'MENTIS',
   keywords: ['dyslexia', 'screening', 'children', 'education', 'learning', 'assessment', 'eye tracking', 'smart pen'],
+  // Absolute base for og:image — link previews (WhatsApp, LinkedIn, Canva) cannot
+  // resolve a relative path, and without og tags they fall back to whatever icon
+  // they happen to have cached.
+  metadataBase: new URL('https://mentis-sih.netlify.app'),
+  openGraph: {
+    type: 'website',
+    siteName: 'MENTIS',
+    title: 'MENTIS — Dyslexia & dysgraphia screening from a webcam and a writing pad',
+    description:
+      'A child reads a passage while the webcam tracks their eyes, then writes while a stylus records every stroke. 23 signals, one explainable result. Screening aid, not a diagnosis.',
+    url: 'https://mentis-sih.netlify.app',
+    locale: 'en_IN',
+    images: [
+      {
+        url: '/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'MENTIS — dyslexia and dysgraphia screening from a webcam and a writing pad',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MENTIS — Dyslexia & dysgraphia screening',
+    description:
+      'Eye movement and pen stroke measured together. 23 signals, one explainable result.',
+    images: ['/opengraph-image.png'],
+  },
   icons: {
     icon: [
       {
