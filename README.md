@@ -17,6 +17,14 @@ plan for the teacher and the parent.
 
 ---
 
+## Full documentation
+
+Deeper writeups live in [`docs/`](docs/) — problem, solution, features, architecture,
+tech stack, frontend, backend, the ML model, the dataset generator, workflow, deployment
+and limitations. Start at [docs/README.md](docs/README.md).
+
+---
+
 ## Why
 
 India already requires this. The instrument is what is missing.
